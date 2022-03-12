@@ -2,6 +2,7 @@ package event
 
 import (
 	"context"
+
 	"github.com/BrosSquad/go-collect/pkg/models"
 	"github.com/rs/zerolog"
 	"gorm.io/gorm"
@@ -36,6 +37,8 @@ func (service *ParticipantService) Evident(ctx context.Context, request Particip
 	if result.Error != nil {
 		return []byte{}, result.Error
 	}
+
+	return nil,  nil
 	//
 	//	// TODO: Hash password if TIME is LEFT
 	//	if password != user.Password {

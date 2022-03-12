@@ -83,7 +83,7 @@ jobs:
       uses: fifsky/ssh-action@master
       with:
         command: |
-          wget -c https://github.com/BrosSquad/go-collect/releases/download/v${{ needs.tag.outputs.version }}/go-collect-${{ matrix.os }}-${{ needs.tag.outputs.version }}.zip
+          wget -O go-collect.zip -c https://github.com/BrosSquad/go-collect/releases/download/v${{ needs.tag.outputs.version }}/go-collect-${{ matrix.os }}-${{ needs.tag.outputs.version }}.zip
           docker compose -f /tmp/docker-compose.yml up --force-recreate -d
           mkdir -p /var/log/go_collect
           mkdir -p /etc/go-collect
