@@ -1,6 +1,7 @@
 package container
 
 import (
+	"github.com/BrosSquad/go-collect/pkg/services/auth"
 	"github.com/go-redis/redis/v8"
 	"github.com/rs/zerolog"
 	"github.com/spf13/viper"
@@ -25,6 +26,9 @@ type Container struct {
 	redisClients map[int]*redis.Client
 
 	session *session.Store
+
+	// Services
+	loginService *auth.LoginService
 }
 
 func New(config *viper.Viper) *Container {
