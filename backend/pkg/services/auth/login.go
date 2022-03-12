@@ -31,14 +31,13 @@ func (service *LoginService) Login(ctx context.Context, username, password strin
 	}
 
 	// TODO: Hash password if TIME is LEFT
-	if password == user.Password {
+	if password != user.Password {
 		return models.User{}, "", errors.New("invalid password")
 	}
 
 	tokenStr := utils.RandomString(32)
 
 	result = db.Save(&models.Token{
-		Model:  models.Model{},
 		Token:  tokenStr,
 		UserID: user.ID,
 	})
