@@ -31,7 +31,7 @@ func ParseEnvironment(env string) Env {
 	case "testing", "test":
 		return Testing
 	default:
-		return Production
+		return Development
 	}
 }
 
