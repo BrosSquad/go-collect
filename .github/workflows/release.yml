@@ -74,7 +74,11 @@ jobs:
           asset_name: go-collect-${{ matrix.os }}-${{ needs.tag.outputs.version }}.zip
           asset_content_type: application/octet-stream
   deploy:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        go: [1.17.x]
+    runs-on: ${{ matrix.os }}
     needs: [build, release, tag]
     steps:
     - name: Checkout
