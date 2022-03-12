@@ -1,6 +1,8 @@
 package main
 
 import (
+	"flag"
+
 	"github.com/BrosSquad/go-collect/pkg/db/seeds"
 	"github.com/BrosSquad/go-collect/pkg/http"
 	"github.com/rs/zerolog/log"
@@ -9,8 +11,16 @@ import (
 	"github.com/BrosSquad/go-collect/pkg/container"
 )
 
+var (
+	environment string
+)
+
 func main() {
-	env := config.Development
+	flag.StringVar(&environment, "env", "development", "Server Configuration")
+	flag.Parse()
+
+	env := config.ParseEnvironment(environment)
+
 	configuration, err := config.New(env)
 
 	if err != nil {

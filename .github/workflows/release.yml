@@ -18,18 +18,8 @@ jobs:
         with:
           tagRegex: 'v(.*)'
           tagRegexGroup: 1
-  docker:
-    uses: BrosSquad/go-collect/.github/workflows/docker.yml@main
-    needs: [tag]
-    with:
-      IMAGE_NAME: 'brossquad/go-collect:${{ needs.tag.outputs.version }}'
-      VERSION: ${{ needs.tag.outputs.version }}
-    secrets:
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
   release:
     runs-on: ubuntu-latest
-    needs: [docker]
     outputs:
       upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
@@ -48,10 +38,10 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest]
         go: [1.17.x]
     runs-on: ${{ matrix.os }}
-    needs: [docker, tag, release]
+    needs: [tag, release]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -65,8 +55,6 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
-      - name: Test
-        run: make test RACE=1 ENVIRONMENT=production
       - name: Build
         working-directory: backend
         run: make build VERSION=${{ needs.tag.outputs.version }} RACE=0 ENVIRONMENT=production
@@ -82,34 +70,36 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
-          asset_path: grpc-test.zip
-          asset_name: grpc-test-${{ matrix.os }}-${{ needs.tag.outputs.version }}
+          asset_path: backend/go-collect.zip
+          asset_name: go-collect.zip
           asset_content_type: application/octet-stream
   deploy:
-    runs-on: ubuntu-latest
-    needs: [build, docker, release, tag]
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        go: [1.17.x]
+    runs-on: ${{ matrix.os }}
+    needs: [build, release, tag]
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-    - name: Copy Application to Server
-      uses: appleboy/scp-action@master
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USER }}
-        key: ${{ secrets.PRIVATE_KEY }}
-        overwrite: true
-        source: "backend/docker-compose.yml"
-        target: "/tmp"
-        tar_tmp_path: '/tmp'
     - name: Deploy Application
       uses: fifsky/ssh-action@master
       with:
         command: |
-          docker compose -f /tmp/docker-compose.yml up --force-recreate -d
-          docker pull brossquad/go-collect:${{ needs.tag.outputs.version }}
-          docker rm -f go_collect
+          wget -O /tmp/go-collect.zip -c https://github.com/BrosSquad/go-collect/releases/download/v${{ needs.tag.outputs.version }}/go-collect.zip
           mkdir -p /var/log/go_collect
-          docker run --rm -p 80:80 -it -v '/etc/go_collect/config.yml:/etc/go_collect/config.yml' -v '/var/log/go_collect:/var/log/go_collect' --restart unless-stopped --network go_collect --name go_collect brossquad/go-collect:${{ needs.tag.outputs.version }}
+          mkdir -p /etc/go-collect
+          rm -rf /tmp/go-collect.zip
+          rm -rf /tmp/go-collect
+          unzip -d go-collect /tmp/go-collect.zip
+          docker-compose -f /tmp/go-collect/bin/docker-compose.yml up --force-recreate -d
+          cp /tmp/go-collect/bin/config.yml /etc/go-collect/config.yml
+          cp /tmp/go-collect/bin/go-collect /bin/go-collect
+          chmod +x /bin/go-collect
+          cp /tmp/go-collect/bin/go-collect.service /usr/lib/systemd/system/go-collect.service
+          systemctl daemon-reload
+          systemctl enable --now go-collect
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
         key: ${{ secrets.PRIVATE_KEY }}

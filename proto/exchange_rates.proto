@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package login;
+
+option go_package = "github.com/BrosSquad/go-collect/pb;pb";
+
+message ExchangeRateResponse {
+	repeated ExchangeRate data = 1;
+}
+
+message ExchangeRate {
+	string name = 1;
+	uint64 modifier = 2;
+}

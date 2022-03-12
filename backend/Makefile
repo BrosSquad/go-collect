@@ -22,10 +22,12 @@ else
 	@echo "Target ${ENV} is not supported"
 endif
 	@cp ./config.example.yml bin/config.yml
+	@cp ./go-collect.service bin/go-collect.service
+	@cp ./docker-compose.yml bin/docker-compose.yml
 
 .PHONY: zip
 zip:
-	@zip -r $(APP_NAME).zip bin
+	@zip -r $(APP_NAME).zip bin/
 
 
 .PHONY: test
@@ -57,6 +59,10 @@ lint:
 .PHONY: fmt
 fmt:
 	@gofumpt -l -w .
+
+# .PHONY: zip
+# zip:
+# 	@zip -r go-collect.zip bin/
 
 .PHONY: install-migrate-cli
 install-migrate-cli:
