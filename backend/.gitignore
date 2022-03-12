@@ -1,0 +1,7 @@
+build/
+config.yml
+coverage.txt
+logs/
+bin/
+tmp/
+.idea/
