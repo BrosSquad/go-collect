@@ -1,12 +1,14 @@
 package container
 
 import (
+	"os"
+
+	"github.com/BrosSquad/go-collect/pkg/services"
 	"github.com/BrosSquad/go-collect/pkg/services/auth"
 	"github.com/go-redis/redis/v8"
 	"github.com/rs/zerolog"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
-	"os"
 
 	"github.com/gofiber/fiber/v2/middleware/session"
 )
@@ -28,7 +30,8 @@ type Container struct {
 	session *session.Store
 
 	// Services
-	loginService *auth.LoginService
+	loginService        *auth.LoginService
+	exchangeRateService *services.ExchangeRateService
 }
 
 func New(config *viper.Viper) *Container {
