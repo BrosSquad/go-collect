@@ -1,5 +1,11 @@
-import { useEffect, useState } from 'react'
-import { EasingFunction, ViewStyle } from 'react-native'
+import {
+  forwardRef,
+  MutableRefObject,
+  useEffect,
+  useImperativeHandle,
+  useState,
+} from 'react'
+import { EasingFunction, View, ViewStyle } from 'react-native'
 import { SimpleAnimation } from 'react-native-simple-animations'
 
 // https://github.com/joeyschroeder/react-native-simple-animations#configuration
@@ -27,38 +33,68 @@ type SequencerProps = {
   onSequenceEnd?: () => void
 }
 
-const Sequencer = ({ items, onSequenceEnd }: SequencerProps) => {
-  const [index, setIndex] = useState(0)
-  const [{ component: Component, animationConfig }, setCurrentItem] =
-    useState<SequenceItem>(items[index])
-
-  useEffect(() => {
-    const isLast = index === items.length - 1
-    if (isLast) {
-      onSequenceEnd && onSequenceEnd()
-    } else {
-      setTimeout(() => {
-        let nextIndex: number
-        setIndex((prev) => {
-          nextIndex = prev + 1
-          return nextIndex
-        })
-        setCurrentItem(items[nextIndex])
-      }, (animationConfig.duration || 0) + (animationConfig.delay || 0))
-    }
-  }, [
-    animationConfig.duration,
-    animationConfig.delay,
-    index,
-    items.length,
-    onSequenceEnd,
-  ])
-
-  return (
-    <SimpleAnimation {...animationConfig} animateOnUpdate>
-      <Component />
-    </SimpleAnimation>
-  )
+export type SequencerRef = {
+  skip: () => void
 }
+
+const Sequencer = forwardRef<SequencerRef, SequencerProps>(
+  ({ items, onSequenceEnd }: SequencerProps, ref) => {
+    const [index, setIndex] = useState(0)
+
+    const [item, setCurrentItem] = useState<SequenceItem>(items[index])
+
+    useEffect(() => {
+      if (!item) {
+        return
+      }
+      const isLast = index === items.length - 1
+      if (isLast) {
+        onSequenceEnd && onSequenceEnd()
+      } else {
+        const {
+          animationConfig: { duration, delay },
+        } = item
+        setTimeout(() => {
+          let nextIndex: number
+          setIndex((prev) => {
+            nextIndex = prev + 1
+            return nextIndex
+          })
+          setCurrentItem(items[nextIndex])
+        }, (duration || 0) + (delay || 0))
+      }
+    }, [item, index, items.length, onSequenceEnd])
+
+    useImperativeHandle(ref, () => ({
+      skip: () => {
+        const isLast = index === items.length - 1
+        if (!isLast) {
+          let nextIndex: number
+          setIndex((prev) => {
+            nextIndex = prev + 1
+            return nextIndex
+          })
+          setCurrentItem(items[nextIndex])
+        }
+      },
+    }))
+
+    if (!item) {
+      onSequenceEnd && onSequenceEnd()
+
+      return null
+    }
+
+    const { animationConfig, component: Component } = item
+
+    return (
+      <View ref={ref as unknown as MutableRefObject<View>}>
+        <SimpleAnimation {...animationConfig} animateOnUpdate>
+          <Component />
+        </SimpleAnimation>
+      </View>
+    )
+  }
+)
 
 export default Sequencer
