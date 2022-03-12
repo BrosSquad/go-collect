@@ -71,27 +71,27 @@ jobs:
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
           asset_path: backend/go-collect.zip
-          asset_name: go-collect-${{ matrix.os }}-${{ needs.tag.outputs.version }}
+          asset_name: go-collect-${{ matrix.os }}-${{ needs.tag.outputs.version }}.zip
           asset_content_type: application/octet-stream
-  # deploy:
-  #   runs-on: ubuntu-latest
-  #   needs: [build, release, tag]
-  #   steps:
-  #   - name: Checkout
-  #     uses: actions/checkout@v2
-  #   - name: Deploy Application
-  #     uses: fifsky/ssh-action@master
-  #     with:
-  #       command: |
-  #         wget -c https://github.com/BrosSquad/go-collect/releases/download/v${{ needs.tag.outputs.version }}/go-collect.zip
-  #         docker compose -f /tmp/docker-compose.yml up --force-recreate -d
-  #         mkdir -p /var/log/go_collect
-  #         mkdir -p /etc/go-collect
-  #         unzip -d go-collect /tmp/go-collect.zip
-  #         cp /tmp/go-collect/config.yml /etc/go-collect/config.yml
-  #         cp /tmp/go-collect/go-collect.service /usr/lib/systemd/system/go-collect.service
-  #         systemctl daemon-reload
-  #         systemctl enable --now go-collect
-  #       host: ${{ secrets.HOST }}
-  #       username: ${{ secrets.USER }}
-  #       key: ${{ secrets.PRIVATE_KEY }}
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build, release, tag]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Deploy Application
+      uses: fifsky/ssh-action@master
+      with:
+        command: |
+          wget -c https://github.com/BrosSquad/go-collect/releases/download/v${{ needs.tag.outputs.version }}/go-collect-${{ matrix.os }}-${{ needs.tag.outputs.version }}.zip
+          docker compose -f /tmp/docker-compose.yml up --force-recreate -d
+          mkdir -p /var/log/go_collect
+          mkdir -p /etc/go-collect
+          unzip -d go-collect /tmp/go-collect.zip
+          cp /tmp/go-collect/config.yml /etc/go-collect/config.yml
+          cp /tmp/go-collect/go-collect.service /usr/lib/systemd/system/go-collect.service
+          systemctl daemon-reload
+          systemctl enable --now go-collect
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USER }}
+        key: ${{ secrets.PRIVATE_KEY }}
