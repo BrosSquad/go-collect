@@ -2,6 +2,7 @@ package container
 
 import (
 	"github.com/BrosSquad/go-collect/pkg/services"
+	"github.com/BrosSquad/go-collect/pkg/services/achievement"
 	"github.com/BrosSquad/go-collect/pkg/services/auth"
 )
 
@@ -23,4 +24,14 @@ func (c *Container) GetExchangeRateService() *services.ExchangeRateService {
 	c.exchangeRateService = services.NewExchangeRateService(c.GetDbConnection(), c.GetDefaultLogger())
 
 	return c.exchangeRateService
+}
+
+func (c *Container) GetAchievementService() *achievement.AchievementService {
+	if c.achievementService != nil {
+		return c.achievementService
+	}
+
+	c.achievementService = achievement.NewAchievementService(c.GetDbConnection(), c.GetDefaultLogger())
+
+	return c.achievementService
 }

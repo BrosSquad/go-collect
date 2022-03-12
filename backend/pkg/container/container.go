@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/BrosSquad/go-collect/pkg/services"
+	"github.com/BrosSquad/go-collect/pkg/services/achievement"
 	"github.com/BrosSquad/go-collect/pkg/services/auth"
 	"github.com/go-redis/redis/v8"
 	"github.com/rs/zerolog"
@@ -32,6 +33,7 @@ type Container struct {
 	// Services
 	loginService        *auth.LoginService
 	exchangeRateService *services.ExchangeRateService
+	achievementService *achievement.AchievementService
 }
 
 func New(config *viper.Viper) *Container {

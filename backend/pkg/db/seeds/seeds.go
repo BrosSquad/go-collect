@@ -1,10 +1,11 @@
 package seeds
 
 import (
-	"github.com/BrosSquad/go-collect/pkg/models"
-	"gorm.io/gorm"
 	"math/rand"
 	"time"
+
+	"github.com/BrosSquad/go-collect/pkg/models"
+	"gorm.io/gorm"
 )
 
 func seedUsers(db *gorm.DB) {
@@ -85,8 +86,28 @@ func seedAchievements(db *gorm.DB) {
 	db.CreateInBatches(data, 10)
 }
 
+func seedExchangeRates(db *gorm.DB) {
+	data := []models.ExchangeRate{
+		{
+			Name: "Plastics",
+			Modifier: uint64(10),
+		},
+		{
+			Name: "Metal",
+			Modifier: uint64(8),
+		},
+		{
+			Name: "Paper",
+			Modifier: uint64(6),
+		},
+	}
+
+	db.CreateInBatches(data, 10)
+}
+
 func Seed(db *gorm.DB) {
 	seedUsers(db)
 	seedAchievements(db)
 	seedEvents(db)
+	seedExchangeRates(db)
 }

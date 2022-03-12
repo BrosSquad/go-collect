@@ -8,7 +8,7 @@ import (
 
 func ExchangeRateHandler(exchangeRateService *services.ExchangeRateService, logger zerolog.Logger) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		exchnageRates, err := exchangeRateService.Get(c.Context())
+		exchangeRates, err := exchangeRateService.Get(c.Context())
 
 		if err != nil {
 			logger.Error().Err(err).Msg("Failed to get exchange rates.")
@@ -16,7 +16,7 @@ func ExchangeRateHandler(exchangeRateService *services.ExchangeRateService, logg
 		}
 
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
-			"data": exchnageRates,
+			"data": exchangeRates,
 		})
 	}
 }
