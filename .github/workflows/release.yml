@@ -19,7 +19,7 @@ jobs:
           tagRegex: 'v(.*)'
           tagRegexGroup: 1
   docker:
-    uses: BrosSquad/go-collect/.github/workflows/docker.yml@master
+    uses: BrosSquad/go-collect/.github/workflows/docker.yml@main
     needs: [tag]
     with:
       IMAGE_NAME: 'brossquad/go-collect:${{ needs.tag.outputs.version }}'
