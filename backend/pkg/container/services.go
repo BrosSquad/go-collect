@@ -3,7 +3,7 @@ package container
 import "github.com/BrosSquad/go-collect/pkg/services/auth"
 
 func (c *Container) GetLoginService() *auth.LoginService {
-	if c.loginService == nil {
+	if c.loginService != nil {
 		return c.loginService
 	}
 
