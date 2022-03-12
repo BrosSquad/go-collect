@@ -23,15 +23,15 @@ export default function App() {
     <>
       <QueryClientProvider client={queryClient}>
         <IconRegistry icons={EvaIconsPack} />
-        <ApplicationProvider
-          {...eva}
-          theme={{ ...eva[colorScheme], ...goCollectTheme }}
-        >
-          <SafeAreaProvider>
+        <SafeAreaProvider>
+          <ApplicationProvider
+            {...eva}
+            theme={{ ...eva[colorScheme], ...goCollectTheme }}
+          >
             <Navigation colorScheme={colorScheme} />
             <StatusBar />
-          </SafeAreaProvider>
-        </ApplicationProvider>
+          </ApplicationProvider>
+        </SafeAreaProvider>
       </QueryClientProvider>
     </>
   )
