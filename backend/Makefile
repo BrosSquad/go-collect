@@ -3,15 +3,10 @@ ENV ?= development
 RACE ?= 0
 DOCKER ?= 0
 GOPATH ?= ${HOME}/go
-SERVER_PROTOFILES := $(shell find ../proto -iname "*.proto")
 APP_NAME ?= go-collect
 VERSION ?= dev
 
-ifeq ($(DOCKER),1)
-	DATABASE_URL="postgres://postgres:postgres@postgres:5432/grpc_test?sslmode=disable&application_name=GRPCTest&TimeZone=UTC"
-else
-	DATABASE_URL="postgres://postgres:postgres@localhost:5432/grpc_test?sslmode=disable&application_name=GRPCTest&TimeZone=UTC"
-endif
+DATABASE_URL="postgres://postgres:postgres@localhost:5432/go_collect?sslmode=disable&application_name=GoCollect&TimeZone=UTC"
 
 .PHONY: run
 run:
@@ -40,24 +35,6 @@ ifeq ($(RACE), 1)
 else
 	@CC=gcc CXX=g++ go test ./... -covermode=atomic -coverprofile=coverage.txt -timeout 1m
 endif
-
-
-.PHONY: protoc-go
-protoc-go:
-	@echo $(SERVER_PROTOFILES)
-	@mkdir -p pb
-	@protoc -Iproto \
-		--go_out=paths=source_relative:pb \
-		--go-grpc_out=paths=source_relative:pb \
-		$(SERVER_PROTOFILES)
-
-.PHONY: protoc-js-web
-protoc-js-web:
-	@mkdir -p js/
-	@protoc -Iproto \
-		--js_out=import_style=commonjs:js \
-		--grpc-web_out=import_style=typescript,mode=grpcweb:js \
-		$(SERVER_PROTOFILES)
 
 
 .PHONY: buildx
@@ -94,6 +71,11 @@ M_STEP ?= ""
 .PHONY: migrate-down
 migrate-down: install-migrate-cli
 	@migrate -source file://$(shell pwd)/migrations -database $(DATABASE_URL) down $(M_STEP)
+
+.PHONY: migrate
+migrate: install-migrate-cli
+	@migrate -source file://$(shell pwd)/migrations -database $(DATABASE_URL) up
+
 
 M_NAME ?= ""
 

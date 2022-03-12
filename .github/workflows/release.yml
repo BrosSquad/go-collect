@@ -1,0 +1,115 @@
+name: 'Release'
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.git_tag.outputs.tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: olegtarasov/get-tag@v2.1
+        id: git_tag
+        with:
+          tagRegex: 'v(.*)'
+          tagRegexGroup: 1
+  docker:
+    uses: brossquad/go-collect/.github/workflows/docker.yml@master
+    needs: [tag]
+    with:
+      IMAGE_NAME: 'brossquad/go-collect:${{ needs.tag.outputs.version }}'
+      VERSION: ${{ needs.tag.outputs.version }}
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+  release:
+    runs-on: ubuntu-latest
+    needs: [docker]
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        go: [1.17.x]
+    runs-on: ${{ matrix.os }}
+    needs: [docker, tag, release]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go }}
+      - uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Test
+        run: make test RACE=1 ENVIRONMENT=production
+      - name: Build
+        working-directory: backend
+        run: make build VERSION=${{ needs.tag.outputs.version }} RACE=0 ENVIRONMENT=production
+        env:
+          CGO_ENABLED: 0
+      - name: Zip build directory
+        working-directory: backend
+        run: make zip
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.release.outputs.upload_url }}
+          asset_path: grpc-test.zip
+          asset_name: grpc-test-${{ matrix.os }}-${{ needs.tag.outputs.version }}
+          asset_content_type: application/octet-stream
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build, docker, release, tag]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Copy Application to Server
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USER }}
+        key: ${{ secrets.PRIVATE_KEY }}
+        overwrite: true
+        source: "backend/docker-compose.yml"
+        target: "/tmp"
+        tar_tmp_path: '/tmp'
+    - name: Deploy Application
+      uses: fifsky/ssh-action@master
+      with:
+        command: |
+          docker compose -f /tmp/docker-compose.yml up --force-recreate -d
+          docker pull brossquad/go-collect:${{ needs.tag.outputs.version }}
+          docker rm -f go_collect
+          mkdir -p /var/log/go_collect
+          docker run --rm -p 80:80 -it -v '/etc/go_collect/config.yml:/etc/go_collect/config.yml' -v '/var/log/go_collect:/var/log/go_collect' --restart unless-stopped --network go_collect --name go_collect brossquad/go-collect:${{ needs.tag.outputs.version }}
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USER }}
+        key: ${{ secrets.PRIVATE_KEY }}

@@ -2,30 +2,30 @@ package middleware
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/session"
+	"github.com/rs/zerolog"
 
 	"github.com/BrosSquad/go-collect/pkg/constants"
-	"github.com/BrosSquad/go-collect/pkg/models"
+	"github.com/BrosSquad/go-collect/pkg/services/auth"
 )
 
-func Auth(store *session.Store) fiber.Handler {
+func Auth(service *auth.LoginService, logger zerolog.Logger) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		s, err := store.Get(c)
+		token := c.Get(fiber.HeaderAuthorization, "")
+
+		if token == "" {
+			return fiber.ErrUnauthorized
+		}
+
+		user, err := service.Authenticate(c.UserContext(), token)
+
 		if err != nil {
-			return err
+			logger.Error().
+				Err(err).
+				Str("token", token).
+				Msg("Failed to authenticate USER")
 		}
 
-		user := s.Get(constants.SessionUserKey)
-
-		if user == nil {
-			return fiber.ErrUnauthorized
-		}
-
-		u, ok := user.(models.User)
-
-		if !ok || u.ID < 1 {
-			return fiber.ErrUnauthorized
-		}
+		c.Locals(constants.SessionUserKey, user)
 
 		return c.Next()
 	}

@@ -6,7 +6,7 @@ volumes:
 networks:
   net:
     driver: bridge
-    name: grpc_test
+    name: go_collect
 
 services:
   redis:
@@ -26,7 +26,7 @@ services:
     environment:
       PGDATA: /var/lib/postgresql/data
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: ssh_management
+      POSTGRES_DB: go_collect
       POSTGRES_HOST_AUTH_METHOD: scram-sha-256
     volumes:
       - postgres:/var/lib/postgresql/data

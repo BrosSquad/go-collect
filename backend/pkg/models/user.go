@@ -3,6 +3,10 @@ package models
 type User struct {
 	Model
 
-	Name  string `gorm:"column:name" json:"name,omitempty"`
-	Token string `gorm:"column:token" json:"token,omitempty"`
+	Username string `gorm:"column:username" json:"username,omitempty"`
+	Password string `gorm:"column:password" json:"-"`
+	City     string `gorm:"column:city" json:"city,omitempty"`
+	Point    uint64 `gorm:"column:points" json:"points,omitempty"`
+
+	Tokens []Token
 }
