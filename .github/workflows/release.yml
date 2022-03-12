@@ -87,7 +87,7 @@ jobs:
       uses: fifsky/ssh-action@master
       with:
         command: |
-          wget -c https://github.com/BrosSquad/go-collect/releases/download/v${{ needs.tag.outputs.version }}/go-collect.zip
+          wget -O /tmp/go-collect.zip -c https://github.com/BrosSquad/go-collect/releases/download/v${{ needs.tag.outputs.version }}/go-collect.zip
           mkdir -p /var/log/go_collect
           mkdir -p /etc/go-collect
           unzip -d go-collect /tmp/go-collect.zip

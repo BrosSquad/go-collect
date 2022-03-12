@@ -1,4 +1,4 @@
-version: '3.9'
+version: '3.3'
 
 volumes:
   postgres:
@@ -6,8 +6,6 @@ volumes:
 networks:
   net:
     driver: bridge
-    name: go_collect
-
 services:
   redis:
     image: 'redis:6-alpine'
