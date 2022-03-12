@@ -3,6 +3,7 @@ package http
 import (
 	"fmt"
 	"github.com/BrosSquad/go-collect/pkg/container"
+	"github.com/BrosSquad/go-collect/pkg/http/handlers"
 	"net"
 
 	"github.com/rs/zerolog/log"
@@ -21,8 +22,8 @@ import (
 func RunServer(c *container.Container, env config.Env, ip string, port uint16) {
 	fiberConfig := fiber.Config{
 		//StrictRouting: true,
-		AppName: "Go Collect",
-		//ErrorHandler:  errorHandler,
+		AppName:      "Go Collect",
+		ErrorHandler: handlers.Error(c.GetDefaultLogger()),
 	}
 
 	app := fiber.New(fiberConfig)
