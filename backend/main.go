@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/BrosSquad/go-collect/pkg/db/seeds"
 	"github.com/BrosSquad/go-collect/pkg/http"
 	"github.com/rs/zerolog/log"
 
@@ -24,6 +25,8 @@ func main() {
 			log.Error().Err(err).Msg("Failed to close DI Container")
 		}
 	}(c)
+
+	seeds.Seed(c.GetDbConnection())
 
 	http.RunServer(
 		c,
