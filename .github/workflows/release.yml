@@ -68,10 +68,12 @@ jobs:
       - name: Test
         run: make test RACE=1 ENVIRONMENT=production
       - name: Build
+        working-directory: backend
         run: make build VERSION=${{ needs.tag.outputs.version }} RACE=0 ENVIRONMENT=production
         env:
           CGO_ENABLED: 0
       - name: Zip build directory
+        working-directory: backend
         run: make zip
       - name: Upload Release Asset
         id: upload-release-asset
@@ -96,7 +98,7 @@ jobs:
         username: ${{ secrets.USER }}
         key: ${{ secrets.PRIVATE_KEY }}
         overwrite: true
-        source: "docker-compose.yml"
+        source: "backend/docker-compose.yml"
         target: "/tmp"
         tar_tmp_path: '/tmp'
     - name: Deploy Application
