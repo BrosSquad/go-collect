@@ -13,7 +13,7 @@ import (
 func registerRoutes(c *container.Container, app *fiber.App) {
 	app.Get("/", middleware.Auth(c.GetLoginService(), c.GetDefaultLogger()), handlers.HelloWorld())
 
-	app.Post("/event/:id/participate", middleware.Auth(c.GetLoginService(), c.GetDefaultLogger()), events.ParticipantHandler(c.GetParticipantService(), c.GetDefaultLogger()))
+	app.Post("/event/:eventId/participate", middleware.Auth(c.GetLoginService(), c.GetDefaultLogger()), events.ParticipantHandler())
 	app.Get("/exchange-rates", handlers.ExchangeRateHandler(c.GetExchangeRateService(), c.GetDefaultLogger()))
 	app.Get("/achievements", achievement.AchievementHandler(c.GetAchievementService(), c.GetDefaultLogger()))
 	app.Post("/auth/login", auth.LoginHandler(c.GetLoginService(), c.GetDefaultLogger()))

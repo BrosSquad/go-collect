@@ -1,25 +1,30 @@
 package events
 
 import (
-	"github.com/BrosSquad/go-collect/pb"
-	"github.com/BrosSquad/go-collect/pkg/services/event"
+	"encoding/json"
+	"github.com/SSH-Management/utils/v2"
 	"github.com/gofiber/fiber/v2"
-	"github.com/rs/zerolog"
+	"github.com/skip2/go-qrcode"
 )
 
-func ParticipantHandler(participantService *event.ParticipantService, logger zerolog.Logger) fiber.Handler {
+func ParticipantHandler() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		var request pb.ParticipantRequest
+		eventIDInt, err := c.ParamsInt("eventId")
 
-		if err := c.BodyParser(&request); err != nil {
+		if err != nil {
 			return err
 		}
 
-		image, err := participantService.Evident(c.UserContext(), pb.ParticipantRequest{
-			UserId:  c.Locals("user").(uint64),
-			EventId: request.EventId,
-			Status:  request.Status,
+		eventID := uint64(eventIDInt)
+
+		bytes, _ := json.Marshal(struct {
+			EventID uint64 `json:"event_id"`
+			Status  string `json:"status"`
+		}{
+			EventID: eventID,
+			Status:  "in",
 		})
+		image, err := qrcode.Encode(utils.UnsafeString(bytes), 1, 256)
 
 		if err != nil {
 			return err
