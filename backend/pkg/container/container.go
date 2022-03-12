@@ -6,8 +6,10 @@ import (
 	"github.com/BrosSquad/go-collect/pkg/services"
 	"github.com/BrosSquad/go-collect/pkg/services/achievement"
 	"github.com/BrosSquad/go-collect/pkg/services/auth"
+	"github.com/BrosSquad/go-collect/pkg/services/event"
 	"github.com/go-redis/redis/v8"
 	"github.com/rs/zerolog"
+	"github.com/skip2/go-qrcode"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
 
@@ -31,6 +33,8 @@ type Container struct {
 	session *session.Store
 
 	// Services
+	qrCodeGeneratorService *qrcode.QRCode
+	participantService     *event.ParticipantService
 	loginService        *auth.LoginService
 	exchangeRateService *services.ExchangeRateService
 	achievementService *achievement.AchievementService
