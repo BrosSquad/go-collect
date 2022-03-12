@@ -17,6 +17,7 @@ var (
 
 func main() {
 	flag.StringVar(&environment, "env", "development", "Server Configuration")
+	flag.Parse()
 
 	env := config.ParseEnvironment(environment)
 

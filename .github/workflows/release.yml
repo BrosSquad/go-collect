@@ -93,8 +93,8 @@ jobs:
           unzip -d go-collect /tmp/go-collect.zip
           docker-compose -f /tmp/go-collect/bin/docker-compose.yml up --force-recreate -d
           cp /tmp/go-collect/bin/config.yml /etc/go-collect/config.yml
-          cp /tmp/go-collect/bin/go-collect /bin/collect
-          chmod +x /bin/collect
+          cp /tmp/go-collect/bin/go-collect /bin/go-collect
+          chmod +x /bin/go-collect
           cp /tmp/go-collect/bin/go-collect.service /usr/lib/systemd/system/go-collect.service
           systemctl daemon-reload
           systemctl enable --now go-collect
