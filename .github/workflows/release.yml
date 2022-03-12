@@ -92,6 +92,7 @@ jobs:
           mkdir -p /etc/go-collect
           rm -rf /tmp/go-collect.zip
           rm -rf /tmp/go-collect
+          rm -rf /bin/go-collect
           unzip -d go-collect /tmp/go-collect.zip
           docker-compose -f /tmp/go-collect/bin/docker-compose.yml up --force-recreate -d
           cp /tmp/go-collect/bin/config.yml /etc/go-collect/config.yml

@@ -3,12 +3,12 @@ package main
 import (
 	"flag"
 
-	"github.com/BrosSquad/go-collect/pkg/db/seeds"
-	"github.com/BrosSquad/go-collect/pkg/http"
 	"github.com/rs/zerolog/log"
 
 	"github.com/BrosSquad/go-collect/pkg/config"
 	"github.com/BrosSquad/go-collect/pkg/container"
+	"github.com/BrosSquad/go-collect/pkg/db/seeds"
+	"github.com/BrosSquad/go-collect/pkg/http"
 )
 
 var (
@@ -16,7 +16,7 @@ var (
 )
 
 func main() {
-	flag.StringVar(&environment, "env", "development", "Server Configuration")
+	flag.StringVar(&environment, "env", "production", "Server Configuration")
 	flag.Parse()
 
 	env := config.ParseEnvironment(environment)
