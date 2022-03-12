@@ -2,8 +2,10 @@ package container
 
 import (
 	"github.com/BrosSquad/go-collect/pkg/services/auth"
+	"github.com/BrosSquad/go-collect/pkg/services/event"
 	"github.com/go-redis/redis/v8"
 	"github.com/rs/zerolog"
+	"github.com/skip2/go-qrcode"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
 	"os"
@@ -28,7 +30,9 @@ type Container struct {
 	session *session.Store
 
 	// Services
-	loginService *auth.LoginService
+	loginService           *auth.LoginService
+	qrCodeGeneratorService *qrcode.QRCode
+	participantService     *event.ParticipantService
 }
 
 func New(config *viper.Viper) *Container {
