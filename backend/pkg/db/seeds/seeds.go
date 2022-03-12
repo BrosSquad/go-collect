@@ -1,10 +1,12 @@
 package seeds
 
 import (
-	"github.com/BrosSquad/go-collect/pkg/models"
-	"gorm.io/gorm"
 	"math/rand"
 	"time"
+
+	"gorm.io/gorm"
+
+	"github.com/BrosSquad/go-collect/pkg/models"
 )
 
 func seedUsers(db *gorm.DB) {
@@ -13,19 +15,19 @@ func seedUsers(db *gorm.DB) {
 			Username: "test",
 			Password: "password",
 			City:     "Belgrade",
-			Point:    0,
+			Points:    0,
 		},
 		{
 			Username: "test-1",
 			Password: "password-1",
 			City:     "Belgrade",
-			Point:    0,
+			Points:    0,
 		},
 		{
 			Username: "test-2",
 			Password: "password-2",
 			City:     "Belgrade",
-			Point:    0,
+			Points:    0,
 		},
 	}
 
