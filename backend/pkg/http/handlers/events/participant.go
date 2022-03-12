@@ -1,22 +1,37 @@
 package events
 
 import (
-	"net/http"
-
-	"github.com/BrosSquad/go-collect/pb"
+	"encoding/json"
+	"github.com/SSH-Management/utils/v2"
 	"github.com/gofiber/fiber/v2"
-	"github.com/rs/zerolog"
+	"github.com/skip2/go-qrcode"
 )
 
-func Participant(logger zerolog.Logger) fiber.Handler {
+func ParticipantHandler() fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		eventIDInt, err := c.ParamsInt("eventId")
 
-		var request pb.ParticipantRequest
-
-		if err := c.BodyParser(&request); err != nil {
+		if err != nil {
 			return err
 		}
 
-		return c.SendStatus(http.StatusOK)
+		eventID := uint64(eventIDInt)
+
+		bytes, _ := json.Marshal(struct {
+			EventID uint64 `json:"event_id"`
+			Status  string `json:"status"`
+		}{
+			EventID: eventID,
+			Status:  "in",
+		})
+		image, err := qrcode.Encode(utils.UnsafeString(bytes), 1, 256)
+
+		if err != nil {
+			return err
+		}
+
+		c.Set(fiber.HeaderContentType, "image/png")
+
+		return c.Status(fiber.StatusOK).Send(image)
 	}
 }

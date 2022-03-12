@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package login;
+
+option go_package = "github.com/BrosSquad/go-collect/pb;pb";
+
+message AchievementResponse {
+	repeated Achievement data = 1;
+}
+
+message Achievement {
+	string name = 1;
+    string image_url = 2;
+    string description = 3;
+    uint64 points = 4;
+}

@@ -2,9 +2,9 @@ package event
 
 import (
 	"context"
-
-	"github.com/BrosSquad/go-collect/pkg/models"
+	"github.com/BrosSquad/go-collect/pb"
 	"github.com/rs/zerolog"
+	"github.com/skip2/go-qrcode"
 	"gorm.io/gorm"
 )
 
@@ -17,65 +17,16 @@ func NewParticipantService(db *gorm.DB, logger zerolog.Logger) *ParticipantServi
 	return &ParticipantService{db: db, logger: logger}
 }
 
-type ParticipantRequest struct {
-	UserId  uint64
-	EventId uint64
-	Status  string
-}
+func (service *ParticipantService) Evident(ctx context.Context, request pb.ParticipantRequest) ([]byte, error) {
+	service.logger.Log().Msg("evident")
 
-func (service *ParticipantService) Evident(ctx context.Context, request ParticipantRequest) ([]byte, error) {
-	db := service.db.WithContext(ctx)
+	qr, err := qrcode.Encode("1:in", 1, 256)
 
-	participant := &models.Participant{
-		UserID:  request.UserId,
-		EventID: request.EventId,
-		Status:  request.Status,
+	if err != nil {
+		return []byte{}, nil
 	}
 
-	result := db.Create(participant)
+	service.logger.Log().Msgf("request", request)
 
-	if result.Error != nil {
-		return []byte{}, result.Error
-	}
-
-	return nil,  nil
-	//
-	//	// TODO: Hash password if TIME is LEFT
-	//	if password != user.Password {
-	//		return models.User{}, "", errors.New("invalid password")
-	//	}
-	//
-	//	tokenStr := utils.RandomString(32)
-	//
-	//	result = db.Save(&models.Token{
-	//		Token:  tokenStr,
-	//		UserID: user.ID,
-	//	})
-	//
-	//	if result.Error != nil {
-	//		service.logger.Error().
-	//			Err(result.Error).
-	//			Str("username", username).
-	//			Msg("Failed to insert new token")
-	//
-	//		return models.User{}, "", result.Error
-	//	}
-	//
-	//	return user, tokenStr, nil
-	//}
-	//
-	//func (service *LoginService) Authenticate(ctx context.Context, token string) (models.User, error) {
-	//	db := service.db.WithContext(ctx)
-	//
-	//	var tokenModel models.Token
-	//
-	//	result := db.Where("token = ?", token).
-	//		Preload("User").
-	//		First(&tokenModel)
-	//
-	//	if result.Error != nil {
-	//		return models.User{}, result.Error
-	//	}
-	//
-	//	return tokenModel.User, nil
+	return qr, nil
 }
