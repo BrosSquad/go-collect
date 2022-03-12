@@ -88,10 +88,10 @@ jobs:
       with:
         command: |
           wget -c https://github.com/BrosSquad/go-collect/releases/download/v${{ needs.tag.outputs.version }}/go-collect.zip
-          docker-compose -f /tmp/docker-compose.yml up --force-recreate -d
           mkdir -p /var/log/go_collect
           mkdir -p /etc/go-collect
           unzip -d go-collect /tmp/go-collect.zip
+          docker-compose -f /tmp/go-collect/bin/docker-compose.yml up --force-recreate -d
           cp /tmp/go-collect/bin/config.yml /etc/go-collect/config.yml
           cp /tmp/go-collect/bin/go-collect /bin/collect
           chmod +x /bin/collect
