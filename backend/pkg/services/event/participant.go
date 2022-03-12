@@ -3,8 +3,8 @@ package event
 import (
 	"context"
 	"github.com/BrosSquad/go-collect/pb"
-	"github.com/BrosSquad/go-collect/pkg/models"
 	"github.com/rs/zerolog"
+	"github.com/skip2/go-qrcode"
 	"gorm.io/gorm"
 )
 
@@ -18,19 +18,15 @@ func NewParticipantService(db *gorm.DB, logger zerolog.Logger) *ParticipantServi
 }
 
 func (service *ParticipantService) Evident(ctx context.Context, request pb.ParticipantRequest) ([]byte, error) {
-	db := service.db.WithContext(ctx)
-
 	service.logger.Log().Msg("evident")
 
-	participant := &models.Participant{
-		UserID:  request.UserId,
-		EventID: request.EventId,
-		Status:  request.Status,
+	qr, err := qrcode.Encode("1:in", 1, 256)
+
+	if err != nil {
+		return []byte{}, nil
 	}
 
-	if result.Error != nil {
-		return []byte{}, result.Error
-	}
+	service.logger.Log().Msgf("request", request)
 
-	return nil, nil
+	return qr, nil
 }
