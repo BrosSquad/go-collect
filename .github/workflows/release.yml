@@ -92,8 +92,10 @@ jobs:
           mkdir -p /var/log/go_collect
           mkdir -p /etc/go-collect
           unzip -d go-collect /tmp/go-collect.zip
-          cp /tmp/go-collect/config.yml /etc/go-collect/config.yml
-          cp /tmp/go-collect/go-collect.service /usr/lib/systemd/system/go-collect.service
+          cp /tmp/go-collect/bin/config.yml /etc/go-collect/config.yml
+          cp /tmp/go-collect/bin/go-collect /bin/collect
+          chmod +x /bin/collect
+          cp /tmp/go-collect/bin/go-collect.service /usr/lib/systemd/system/go-collect.service
           systemctl daemon-reload
           systemctl enable --now go-collect
         host: ${{ secrets.HOST }}
