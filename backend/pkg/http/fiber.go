@@ -20,8 +20,8 @@ import (
 
 func RunServer(c *container.Container, env config.Env, ip string, port uint16) {
 	fiberConfig := fiber.Config{
-		StrictRouting: true,
-		AppName:       "Go Collect",
+		//StrictRouting: true,
+		AppName: "Go Collect",
 		//ErrorHandler:  errorHandler,
 	}
 
