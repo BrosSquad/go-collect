@@ -71,10 +71,14 @@ jobs:
         with:
           upload_url: ${{ needs.release.outputs.upload_url }}
           asset_path: backend/go-collect.zip
-          asset_name: go-collect-${{ matrix.os }}-${{ needs.tag.outputs.version }}.zip
+          asset_name: go-collect.zip
           asset_content_type: application/octet-stream
   deploy:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        go: [1.17.x]
+    runs-on: ${{ matrix.os }}
     needs: [build, release, tag]
     steps:
     - name: Checkout
@@ -83,13 +87,18 @@ jobs:
       uses: fifsky/ssh-action@master
       with:
         command: |
-          wget -O go-collect.zip -c https://github.com/BrosSquad/go-collect/releases/download/v${{ needs.tag.outputs.version }}/go-collect-${{ matrix.os }}-${{ needs.tag.outputs.version }}.zip
-          docker compose -f /tmp/docker-compose.yml up --force-recreate -d
+          rm -rf /tmp/go-collect.zip
+          rm -rf /tmp/go-collect
+          rm -rf /bin/go-collect
+          wget -O /tmp/go-collect.zip -c https://github.com/BrosSquad/go-collect/releases/download/v${{ needs.tag.outputs.version }}/go-collect.zip
           mkdir -p /var/log/go_collect
           mkdir -p /etc/go-collect
           unzip -d go-collect /tmp/go-collect.zip
-          cp /tmp/go-collect/config.yml /etc/go-collect/config.yml
-          cp /tmp/go-collect/go-collect.service /usr/lib/systemd/system/go-collect.service
+          docker-compose -f /tmp/go-collect/bin/docker-compose.yml up --force-recreate -d
+          cp /tmp/go-collect/bin/config.yml /etc/go-collect/config.yml
+          cp /tmp/go-collect/bin/go-collect /bin/go-collect
+          chmod +x /bin/go-collect
+          cp /tmp/go-collect/bin/go-collect.service /usr/lib/systemd/system/go-collect.service
           systemctl daemon-reload
           systemctl enable --now go-collect
         host: ${{ secrets.HOST }}

@@ -3,6 +3,9 @@ import eva from '@eva-design/eva'
 export const goCollectTheme = {
   ...eva,
 
+  googleRed: '#DB4437',
+  facebookBlue: '#4267B2',
+
   'color-primary-100': '#CEFBD7',
   'color-primary-200': '#9EF7BA',
   'color-primary-300': '#6BE89E',

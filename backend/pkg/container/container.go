@@ -1,6 +1,9 @@
 package container
 
 import (
+	"os"
+
+	"github.com/BrosSquad/go-collect/pkg/services"
 	"github.com/BrosSquad/go-collect/pkg/services/auth"
 	"github.com/BrosSquad/go-collect/pkg/services/event"
 	"github.com/go-redis/redis/v8"
@@ -8,7 +11,6 @@ import (
 	"github.com/skip2/go-qrcode"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
-	"os"
 
 	"github.com/gofiber/fiber/v2/middleware/session"
 )
@@ -30,9 +32,10 @@ type Container struct {
 	session *session.Store
 
 	// Services
-	loginService           *auth.LoginService
 	qrCodeGeneratorService *qrcode.QRCode
 	participantService     *event.ParticipantService
+	loginService        *auth.LoginService
+	exchangeRateService *services.ExchangeRateService
 }
 
 func New(config *viper.Viper) *Container {

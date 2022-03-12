@@ -4,7 +4,7 @@ tmp_dir = "tmp"
 [build]
 cmd = "CC=gcc CXX=g++ make build"
 bin = "bin/go-collect"
-full_bin = "dlv exec --continue --log --listen=0.0.0.0:2345 --allow-non-terminal-interactive --headless=true --api-version=2 --accept-multiclient ./bin/go-collect"
+full_bin = "dlv exec --continue --log --listen=0.0.0.0:2345 --allow-non-terminal-interactive --headless=true --api-version=2 --accept-multiclient ./bin/go-collect -env development"
 include_ext = ["go", "yml"]
 exclude_dir = ["public", "vendor", "log", "tmp"]
 exclude_file = ["Dockerfile"]

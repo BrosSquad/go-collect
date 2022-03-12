@@ -1,6 +1,7 @@
 package container
 
 import (
+	"github.com/BrosSquad/go-collect/pkg/services"
 	"github.com/BrosSquad/go-collect/pkg/services/auth"
 	"github.com/BrosSquad/go-collect/pkg/services/event"
 	"github.com/skip2/go-qrcode"
@@ -34,4 +35,15 @@ func (c *Container) GetQrCodeGenerator() *qrcode.QRCode {
 	c.qrCodeGeneratorService, _ = qrcode.New("", 1)
 
 	return c.qrCodeGeneratorService
+
+}
+
+func (c *Container) GetExchangeRateService() *services.ExchangeRateService {
+	if c.exchangeRateService != nil {
+		return c.exchangeRateService
+	}
+
+	c.exchangeRateService = services.NewExchangeRateService(c.GetDbConnection(), c.GetDefaultLogger())
+
+	return c.exchangeRateService
 }
