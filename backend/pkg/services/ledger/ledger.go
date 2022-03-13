@@ -33,6 +33,10 @@ type (
 		Achievements              []models.Achievement `json:"achievement"`
 		Events                    []models.Event       `json:"events"`
 	}
+
+	EventBoard struct {
+
+	}
 )
 
 func (s *Service) CalculateUserMetrics(ctx context.Context, userId uint64) (*UserMetrics, error) {
@@ -75,7 +79,7 @@ func (s *Service) CalculateUserMetrics(ctx context.Context, userId uint64) (*Use
 	}, 0, 10)
 
 	db.Raw(
-		"SELECT exchange_rate_id, SUM(quantity) as quantity FROM ledgers WHERE user_id = ? GROUP BY exchange_rate_id", 
+		"SELECT exchange_rate_id, SUM(quantity) as quantity FROM ledgers WHERE user_id = ? GROUP BY exchange_rate_id",
 		userId,
 		).Scan(&counts)
 
