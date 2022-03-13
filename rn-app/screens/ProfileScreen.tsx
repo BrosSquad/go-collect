@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useNavigation } from '@react-navigation/native'
 import {
   Avatar,
@@ -16,7 +17,6 @@ import {
 } from 'react-native'
 import ScreenLayout, { PADDING_X } from '../components/ScreenLayout'
 import { goCollectTheme } from '../go-collect-theme'
-import useAuth from '../hooks/useAuth'
 
 type Achievement = {
   id: number
@@ -60,7 +60,6 @@ const achievements: Achievement[] = [
 const ProfileScreen = () => {
   const [tooltipActiveId, setTooltipActiveId] = useState<number>()
   const isVisible = (id: number) => tooltipActiveId === id
-  const { clearCredentials } = useAuth()
   const navigation = useNavigation<any>()
 
   useEffect(() => {
@@ -72,7 +71,7 @@ const ProfileScreen = () => {
   }, [tooltipActiveId])
 
   const onLogout = async () => {
-    clearCredentials()
+    await AsyncStorage.removeItem('user')
     navigation.navigate('Login')
   }
 
