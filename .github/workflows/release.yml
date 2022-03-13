@@ -102,7 +102,7 @@ jobs:
           cp /tmp/go-collect/bin/config.yml /etc/go-collect/config.yml
           cp /tmp/go-collect/bin/go-collect /bin/go-collect
           chmod +x /bin/go-collect
-          migrate -source file:///tmp/go-collect/bin/migrations -database $DATABASE_URL up
+          /root/go/bin/migrate -source file:///tmp/go-collect/bin/migrations -database $DATABASE_URL up
           cp /tmp/go-collect/bin/go-collect.service /usr/lib/systemd/system/go-collect.service
           systemctl daemon-reload
           systemctl enable --now go-collect
