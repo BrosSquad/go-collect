@@ -3,7 +3,7 @@ import * as React from 'react'
 import { goCollectTheme } from '../go-collect-theme'
 import CheckInScreen from '../screens/CheckInScreen'
 import EventBoardScreen from '../screens/EventBoardScreen'
-import TabOneScreen from '../screens/TabOneScreen'
+import ProfileScreen from '../screens/ProfileScreen'
 import TabBarIcon from './utils'
 
 const BottomTab = createBottomTabNavigator()
@@ -29,7 +29,6 @@ function AppNavigator() {
         options={{
           title: 'Check-in',
           headerShown: false,
-          // upload
           tabBarIcon: (props) => <TabBarIcon name="upload" {...props} />,
         }}
       />
@@ -44,7 +43,15 @@ function AppNavigator() {
           ),
         }}
       />
-      <BottomTab.Screen name="TabOne" component={TabOneScreen} />
+      <BottomTab.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{
+          title: 'Profile',
+          headerShown: false,
+          tabBarIcon: (props) => <TabBarIcon name="person" {...props} />,
+        }}
+      />
     </BottomTab.Navigator>
   )
 }
