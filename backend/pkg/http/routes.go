@@ -16,7 +16,7 @@ func registerRoutes(c *container.Container, app *fiber.App) {
 	app.Get("/", authMiddleware, handlers.HelloWorld())
 
 	app.Get("/user-profile", authMiddleware, handlers.UserProfileMetrics(c.GetLedgerService()))
-
+	app.Post("/ledger", authMiddleware, handlers.InsertLedger(c.GetLedgerService()))
 	app.Get("/", middleware.Auth(c.GetLoginService(), c.GetDefaultLogger()), handlers.HelloWorld())
 
 	app.Post("/event/:eventId/participate", middleware.Auth(c.GetLoginService(), c.GetDefaultLogger()), events.ParticipantHandler())

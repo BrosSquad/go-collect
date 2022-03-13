@@ -2,6 +2,7 @@ package events
 
 import (
 	"encoding/json"
+
 	"github.com/SSH-Management/utils/v2"
 	"github.com/gofiber/fiber/v2"
 	"github.com/skip2/go-qrcode"

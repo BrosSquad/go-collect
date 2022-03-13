@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package login;
+
+option go_package = "github.com/BrosSquad/go-collect/pb;pb";
+
+message LedgerRequest {
+    uint64 event_id = 1;
+    uint64 exchange_rate_id = 2;
+    uint64 quantity = 3;
+}
