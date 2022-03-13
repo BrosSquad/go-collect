@@ -12,8 +12,8 @@ protoc-go:
 # TODO: Change Path
 .PHONY: protoc-js-web
 protoc-js-web:
-	@mkdir -p js/
+	@mkdir -p rn-app/requests/types/
 	@protoc -Iproto \
-		--js_out=import_style=commonjs:js \
-		--grpc-web_out=import_style=typescript,mode=grpcweb:js \
+		--js_out=import_style=commonjs:rn-app/requests/types \
+		--grpc-web_out=import_style=typescript,mode=grpcweb:rn-app/requests/types \
 		$(SERVER_PROTOFILES)

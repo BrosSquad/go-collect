@@ -23,15 +23,15 @@ func New(db *gorm.DB, logger zerolog.Logger) *Service {
 
 type (
 	TotalByExchange struct {
-		TotalPoints uint64 `json:"total_points"`
+		TotalPoints  uint64              `json:"total_points"`
 		ExchangeRate models.ExchangeRate `json:"exchange_rate"`
 	}
 
 	UserMetrics struct {
-		TotalPoints               uint64 `json:"total_points"`
-		TotalPointsByExchangeRate []TotalByExchange `json:"total_points_by_exchange_rate"`
+		TotalPoints               uint64               `json:"total_points"`
+		TotalPointsByExchangeRate []TotalByExchange    `json:"total_points_by_exchange_rate"`
 		Achievements              []models.Achievement `json:"achievement"`
-		Events                    []models.Event `json:"events"`
+		Events                    []models.Event       `json:"events"`
 	}
 )
 
@@ -53,9 +53,9 @@ func (s *Service) CalculateUserMetrics(ctx context.Context, userId uint64) (*Use
 	}
 
 	res := &UserMetrics{
-		TotalPoints:  user.Points,
-		Events:       user.Events,
-		Achievements: user.Achievements,
+		TotalPoints:               user.Points,
+		Events:                    user.Events,
+		Achievements:              user.Achievements,
 		TotalPointsByExchangeRate: make([]TotalByExchange, 0, 10),
 	}
 
@@ -69,31 +69,33 @@ func (s *Service) CalculateUserMetrics(ctx context.Context, userId uint64) (*Use
 		return nil, result.Error
 	}
 
-	counts := make([]struct{
+	counts := make([]struct {
 		ExchangeRateId uint64 `gorm:"column:exchange_rate_id"`
-		Quantity uint64 `gorm:"column:quantity"`
+		Quantity       uint64 `gorm:"column:quantity"`
 	}, 0, 10)
 
-	result = db.Model(&models.Ledger{}).
-		Where("user_id = ?", userId).
-		Group("exchange_rate_id").
-		Select("exchange_rate_id", "SUM(quantity) as quantity").
-		Find(counts)
+	db.Raw("SELECT exchange_rate_id, SUM(quantity) as quantity FROM ledgers WHERE user_id = ?", userId).Scan(&counts)
 
-	if result.Error != nil {
-		s.logger.Error().
-			Err(result.Error).
-			Msg("Failed to fetch user metrics")
-
-		return nil, result.Error
-	}
+	//result = db.Model(&models.Ledger{}).
+	//	Where("user_id = ?", userId).
+	//	Group("exchange_rate_id").
+	//	Select("exchange_rate_id", "SUM(quantity) as quantity").
+	//	Find(counts)
+	//
+	//if result.Error != nil {
+	//	s.logger.Error().
+	//		Err(result.Error).
+	//		Msg("Failed to fetch user metrics")
+	//
+	//	return nil, result.Error
+	//}
 
 	for _, count := range counts {
 		for _, exchangeRate := range exchangeRates {
 			if count.ExchangeRateId == exchangeRate.ID {
 				res.TotalPointsByExchangeRate = append(res.TotalPointsByExchangeRate, TotalByExchange{
 					ExchangeRate: exchangeRate,
-					TotalPoints: count.Quantity * exchangeRate.Modifier,
+					TotalPoints:  count.Quantity * exchangeRate.Modifier,
 				})
 			}
 		}

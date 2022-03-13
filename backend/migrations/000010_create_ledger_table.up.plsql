@@ -1,4 +1,4 @@
-CREATE TABLE ledger(
+CREATE TABLE ledgers(
     id bigserial PRIMARY KEY,
     user_id bigserial NOT NULL,
     event_id bigserial NOT NULL,
