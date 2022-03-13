@@ -22,6 +22,7 @@ func (service *ParticipantService) Evident(ctx context.Context, request pb.Parti
 	model := models.Participant{
 		UserID:  request.UserId,
 		EventID: request.EventId,
+		Status: "in",
 	}
 
 	result := service.db.Save(&model)
