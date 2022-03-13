@@ -2,6 +2,7 @@ package event
 
 import (
 	"context"
+	"time"
 
 	"github.com/BrosSquad/go-collect/pb"
 	"github.com/BrosSquad/go-collect/pkg/models"
@@ -23,6 +24,7 @@ func (service *ParticipantService) Evident(ctx context.Context, request pb.Parti
 		UserID:  request.UserId,
 		EventID: request.EventId,
 		Status: "in",
+		CreatedAt: time.Now(),
 	}
 
 	result := service.db.Save(&model)
