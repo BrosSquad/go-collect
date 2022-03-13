@@ -51,16 +51,8 @@ csrf:
 
 cors:
   headers:
-    - Content-Type
-    - Accept
-    - X-Requested-With
-    - Authorization
-    - Content-Length
-    - X-XSRF-TOKEN
+    - '*'
   origins:
     - '*'
   methods:
-    - GET
-    - POST
-    - PUT
-    - DELETE
+    - '*'

@@ -4,4 +4,5 @@ const (
 	RequestIdKey = "request_id"
 
 	SessionUserKey = "user"
+
 )

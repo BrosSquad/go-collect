@@ -54,6 +54,10 @@ func New(config *viper.Viper) *Container {
 	}
 }
 
+func (c *Container) GetConfig() *viper.Viper {
+	return c.config
+}
+
 func (c *Container) Close() error {
 	for _, l := range c.loggers {
 		_ = l.file.Close()
