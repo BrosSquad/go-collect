@@ -6258,6 +6258,13 @@ react-native-screens@~3.10.1:
     react-freeze "^1.0.0"
     warn-once "^0.1.0"
 
+react-native-simple-animations@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/react-native-simple-animations/-/react-native-simple-animations-0.3.0.tgz#293534481fc58819d92d4ab6da004ea5c2e7b818"
+  integrity sha512-GeuqpXo+FJXOwpffJKNMia0Bd37KiMoiaDdmoK6yn8X27zpknY/5TANLBi1xO28kSXdf8QE3+9/v4WCH9EH86w==
+  dependencies:
+    prop-types "^15.7.2"
+
 react-native-svg@12.1.1:
   version "12.1.1"
   resolved "https://registry.yarnpkg.com/react-native-svg/-/react-native-svg-12.1.1.tgz#5f292410b8bcc07bbc52b2da7ceb22caf5bcaaee"
