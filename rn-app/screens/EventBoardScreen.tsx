@@ -16,7 +16,10 @@ import LoadingScreen from './LoadingScreen'
 
 const EventBoard = () => {
   const { data, isLoading } = useQuery('eventData', getEventData)
-  const [currentHP, setCurrentHP] = useState(data?.total_points - data?.damage)
+  const [currentHP, setCurrentHP] = useState(() => {
+    const nextVal = data?.total_points - data?.damage
+    return isNaN(nextVal) ? data?.total_points : nextVal
+  })
 
   const icons = useMemo(() => [randomIcon(), randomIcon()], [])
 
