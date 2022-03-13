@@ -36,10 +36,11 @@ type Container struct {
 	// Services
 	qrCodeGeneratorService *qrcode.QRCode
 	participantService     *event.ParticipantService
-	loginService        *auth.LoginService
-	exchangeRateService *services.ExchangeRateService
-	ledgerService       *ledger.Service
-	achievementService *achievement.AchievementService
+	loginService           *auth.LoginService
+	exchangeRateService    *services.ExchangeRateService
+	ledgerService          *ledger.Service
+	achievementService     *achievement.AchievementService
+	eventService           *event.EventService
 }
 
 func New(config *viper.Viper) *Container {

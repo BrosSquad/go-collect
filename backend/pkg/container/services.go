@@ -60,3 +60,13 @@ func (c *Container) GetAchievementService() *achievement.AchievementService {
 
 	return c.achievementService
 }
+
+func (c *Container) GetEventService() *event.EventService {
+	if c.eventService != nil {
+		return c.eventService
+	}
+
+	c.eventService = event.NewEventService(c.GetDbConnection(), c.GetDefaultLogger())
+
+	return c.eventService
+}
