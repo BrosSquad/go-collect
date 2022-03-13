@@ -21,7 +21,6 @@ func registerRoutes(c *container.Container, app *fiber.App) {
 	app.Post("/event/:eventId/participate", authMiddleware, events.InsertParticipent(c.GetParticipantService()))
 
 	app.Get("/ws/:eventId/collection",
-		authMiddleware,
 		middleware.WebSocket(),
 		ws.LedgerHandler(c.GetBroadCaster(), c.GetDefaultLogger()),
 	)
