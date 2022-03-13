@@ -105,6 +105,7 @@ jobs:
           cp /tmp/go-collect/bin/go-collect.service /usr/lib/systemd/system/go-collect.service
           systemctl daemon-reload
           systemctl enable --now go-collect
+          systemctl restart go-collect
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
         key: ${{ secrets.PRIVATE_KEY }}

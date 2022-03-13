@@ -2,13 +2,15 @@ package http
 
 import (
 	"fmt"
+	"net"
+
 	"github.com/BrosSquad/go-collect/pkg/container"
 	"github.com/BrosSquad/go-collect/pkg/http/handlers"
-	"net"
 
 	"github.com/rs/zerolog/log"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/pprof"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
@@ -21,7 +23,7 @@ import (
 
 func RunServer(c *container.Container, env config.Env, ip string, port uint16) {
 	fiberConfig := fiber.Config{
-		//StrictRouting: true,
+		// StrictRouting: true,
 		AppName:      "Go Collect",
 		ErrorHandler: handlers.Error(c.GetDefaultLogger()),
 	}
@@ -35,6 +37,14 @@ func RunServer(c *container.Container, env config.Env, ip string, port uint16) {
 		app.Use(recover.New())
 	}
 
+	// Or extend your config for customization
+	app.Use(cors.New(cors.Config{
+		AllowOrigins:     "*",
+		AllowHeaders:     "*",
+		AllowMethods:     "*",
+		AllowCredentials: true,
+	}))
+
 	app.Use(requestid.New(requestid.Config{
 		Generator: func() string {
 			return utils.RandomString(32)
@@ -47,7 +57,6 @@ func RunServer(c *container.Container, env config.Env, ip string, port uint16) {
 	addr := fmt.Sprintf("%s:%d", ip, port)
 
 	listener, err := net.Listen("tcp4", addr)
-
 	if err != nil {
 		log.
 			Fatal().
