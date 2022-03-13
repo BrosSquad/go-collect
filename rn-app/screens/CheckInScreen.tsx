@@ -1,12 +1,22 @@
+import { useNavigation } from '@react-navigation/native'
 import { Text } from '@ui-kitten/components'
 import { BarCodeScanner } from 'expo-barcode-scanner'
 import { useEffect, useState } from 'react'
 import { StyleSheet } from 'react-native'
+import { useMutation } from 'react-query'
 import ScreenLayout from '../components/ScreenLayout'
+import { checkInRequest } from '../requests'
 
 const CheckInScreen = () => {
   const [hasPermission, setHasPermission] = useState(null)
   const [scanned, setScanned] = useState(false)
+  const navigation = useNavigation<any>()
+
+  const mutation = useMutation(checkInRequest, {
+    onSuccess: () => {
+      navigation.navigate('EventBoard')
+    },
+  })
 
   useEffect(() => {
     ;(async () => {
@@ -15,9 +25,11 @@ const CheckInScreen = () => {
     })()
   }, [])
 
-  const handleBarCodeScanned = ({ type, data }) => {
+  const handleBarCodeScanned = ({ data }) => {
     setScanned(true)
-    alert(`Bar code with type ${type} and data ${data} has been scanned!`)
+    const { event_id } = JSON.parse(data)
+    mutation.mutate({ event_id })
+    navigation.navigate('EventBoard')
   }
 
   if (hasPermission === null) {
@@ -30,7 +42,7 @@ const CheckInScreen = () => {
   return (
     <ScreenLayout>
       <BarCodeScanner
-        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+        onBarCodeScanned={handleBarCodeScanned}
         style={StyleSheet.absoluteFillObject}
       />
     </ScreenLayout>

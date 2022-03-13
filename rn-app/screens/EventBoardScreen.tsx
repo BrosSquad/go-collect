@@ -54,7 +54,7 @@ const EventBoard = () => {
       <ScrollView>
         <BossHealth maxHP={1000} currentHP={300} />
         <Text category="h4" style={{ textAlign: 'center', marginTop: 16 }}>
-          Očistimo Krnjaču
+          Očistimo Dorcol
         </Text>
         <CountdownTimer endTime="2022-03-13T14:00:00.0000" />
         <IndividualScore score={individualScore} />
