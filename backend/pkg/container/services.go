@@ -6,6 +6,7 @@ import (
 	"github.com/BrosSquad/go-collect/pkg/services/auth"
 	"github.com/BrosSquad/go-collect/pkg/services/event"
 	"github.com/BrosSquad/go-collect/pkg/services/ledger"
+	"github.com/dustin/go-broadcast"
 )
 
 func (c *Container) GetLoginService() *auth.LoginService {
@@ -69,4 +70,15 @@ func (c *Container) GetEventService() *event.EventService {
 	c.eventService = event.NewEventService(c.GetDbConnection(), c.GetDefaultLogger())
 
 	return c.eventService
+}
+
+
+func (c *Container) GetBroadCaster() broadcast.Broadcaster {
+	if c.broadcaster != nil {
+		return c.broadcaster
+	}
+
+	c.broadcaster = broadcast.NewBroadcaster(100)
+
+	return c.broadcaster
 }

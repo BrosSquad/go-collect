@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 
+	broadcast "github.com/dustin/go-broadcast"
 	"github.com/gofiber/fiber/v2"
 
 	"github.com/BrosSquad/go-collect/pb"
@@ -12,7 +13,7 @@ import (
 	"github.com/BrosSquad/go-collect/pkg/services/ledger"
 )
 
-func InsertLedger(ledgerService *ledger.Service) fiber.Handler {
+func InsertLedger(ledgerService *ledger.Service, caster broadcast.Broadcaster) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		user := c.Locals(constants.SessionUserKey).(models.User)
 
@@ -22,7 +23,7 @@ func InsertLedger(ledgerService *ledger.Service) fiber.Handler {
 			return err
 		}
 
-		ledgerModel, err := ledgerService.Insert(
+		ledgerModel, diff,  err := ledgerService.Insert(
 			c.UserContext(),
 			user,
 			req.ExchangeRateId,
@@ -33,6 +34,11 @@ func InsertLedger(ledgerService *ledger.Service) fiber.Handler {
 		if err != nil {
 			return err
 		}
+
+		caster.Submit(ledger.Diff{
+			Diff: diff,
+			Ledger: ledgerModel,
+		})
 
 		return c.Status(http.StatusCreated).JSON(ledgerModel)
 	}

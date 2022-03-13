@@ -8,6 +8,7 @@ import (
 	"github.com/BrosSquad/go-collect/pkg/services/auth"
 	"github.com/BrosSquad/go-collect/pkg/services/event"
 	"github.com/BrosSquad/go-collect/pkg/services/ledger"
+	"github.com/dustin/go-broadcast"
 	"github.com/go-redis/redis/v8"
 	"github.com/rs/zerolog"
 	"github.com/skip2/go-qrcode"
@@ -41,6 +42,8 @@ type Container struct {
 	ledgerService          *ledger.Service
 	achievementService     *achievement.AchievementService
 	eventService           *event.EventService
+
+	broadcaster broadcast.Broadcaster
 }
 
 func New(config *viper.Viper) *Container {
