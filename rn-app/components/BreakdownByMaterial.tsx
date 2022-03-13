@@ -21,6 +21,16 @@ const BreakdownByMaterial = ({ materials }: BreakdownByMaterialProps) => {
 
   return (
     <FlatList
+      ListHeaderComponent={() => (
+        <>
+          <Text category="h4" style={{ textAlign: 'center', marginTop: 16 }}>
+            Total waste collected
+          </Text>
+          <Text category="s1" style={{ textAlign: 'center', marginTop: 8 }}>
+            This is what we all collected. It's a lot.
+          </Text>
+        </>
+      )}
       style={styles.container}
       numColumns={2}
       data={materials}
