@@ -2,9 +2,10 @@ package event
 
 import (
 	"context"
+
 	"github.com/BrosSquad/go-collect/pb"
+	"github.com/BrosSquad/go-collect/pkg/models"
 	"github.com/rs/zerolog"
-	"github.com/skip2/go-qrcode"
 	"gorm.io/gorm"
 )
 
@@ -17,16 +18,18 @@ func NewParticipantService(db *gorm.DB, logger zerolog.Logger) *ParticipantServi
 	return &ParticipantService{db: db, logger: logger}
 }
 
-func (service *ParticipantService) Evident(ctx context.Context, request pb.ParticipantRequest) ([]byte, error) {
-	service.logger.Log().Msg("evident")
-
-	qr, err := qrcode.Encode("1:in", 1, 256)
-
-	if err != nil {
-		return []byte{}, nil
+func (service *ParticipantService) Evident(ctx context.Context, request pb.ParticipantRequest) (models.Participant, error) {
+	model := models.Participant{
+		UserID:  request.UserId,
+		EventID: request.EventId,
 	}
 
-	service.logger.Log().Msgf("request", request)
+	result := service.db.Save(&model)
 
-	return qr, nil
+	if result.Error != nil {
+		service.logger.Error().Err(result.Error).Msg("Failed to insert Participant")
+		return models.Participant{}, result.Error
+	}
+
+	return model, nil
 }
