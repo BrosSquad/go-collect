@@ -8,7 +8,7 @@ import {
   Text,
   Tooltip,
 } from '@ui-kitten/components'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   ScrollView,
   StyleSheet,
@@ -53,15 +53,12 @@ const ProfileScreen = () => {
     return <LoadingScreen />
   }
 
-  const background = useMemo(() => randomColor(), [])
-  const icon = useMemo(() => randomIcon(), [])
-
   const achievements = data?.achievement?.map(
     (a): Achievement => ({
       id: a.id,
-      background,
+      background: randomColor(),
       description: a.description,
-      icon,
+      icon: randomIcon(),
       label: a.name,
     })
   )
@@ -134,7 +131,11 @@ const ProfileScreen = () => {
           ))}
         </View>
 
-        <Button status="danger" onPress={onLogout}>
+        <Button
+          status="danger"
+          onPress={onLogout}
+          style={{ marginBottom: 120 }}
+        >
           Logout
         </Button>
       </ScrollView>

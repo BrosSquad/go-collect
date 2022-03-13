@@ -19,9 +19,12 @@ export const randomIcon = () => {
 }
 
 export const randomColor = () => {
-  const colors = Object.values(goCollectTheme).filter((color: string) =>
-    color.startsWith('#')
-  )
+  const colors = [
+    goCollectTheme['color-danger-400'],
+    goCollectTheme['color-info-400'],
+    goCollectTheme['color-primary-400'],
+    goCollectTheme['color-warning-400'],
+  ]
 
   return colors[Math.floor(Math.random() * colors.length)]
 }

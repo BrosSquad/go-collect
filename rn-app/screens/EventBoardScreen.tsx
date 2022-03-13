@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Text } from '@ui-kitten/components'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { ScrollView } from 'react-native'
 import { useQuery } from 'react-query'
 import BossHealth from '../components/BossHealth'
@@ -14,16 +14,9 @@ import { getEventData } from '../requests'
 import EndGameScreen from './EndGameScreen'
 import LoadingScreen from './LoadingScreen'
 
-/**
- 
-{
-    refetchInterval: 2 * 1000,
-  }
-
- */
-
 const EventBoard = () => {
   const { data, isLoading } = useQuery('eventData', getEventData)
+  const [currentHP, setCurrentHP] = useState(data?.total_points - data?.damage)
 
   const icons = useMemo(() => [randomIcon(), randomIcon()], [])
 
@@ -70,7 +63,7 @@ const EventBoard = () => {
       }
       websocket.onmessage = (event) => {
         const data = JSON.parse(event.data)
-        console.log('ws', data)
+        setCurrentHP((prev) => prev - data?.Diff)
       }
     })()
 
@@ -82,8 +75,7 @@ const EventBoard = () => {
   if (isLoading) return <LoadingScreen />
 
   const maxHP = data?.total_points
-  const currentHP = data?.total_points - data?.damage
-  if (currentHP === 0) {
+  if (currentHP <= 0) {
     return <EndGameScreen />
   }
 
