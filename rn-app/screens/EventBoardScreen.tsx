@@ -4,6 +4,7 @@ import BossHealth from '../components/BossHealth'
 import BreakdownByMaterial, {
   MaterialStats,
 } from '../components/BreakdownByMaterial'
+import CountdownTimer from '../components/CountdownTimer'
 import ScreenLayout from '../components/ScreenLayout'
 import TopRankedList, { UserRankingStats } from '../components/TopRankedList'
 
@@ -49,6 +50,7 @@ const EventBoard = () => {
         <Text category="h4" style={{ textAlign: 'center', marginTop: 16 }}>
           Očistimo Krnjaču
         </Text>
+        <CountdownTimer endTime="2022-03-13T14:00:00.0000" />
         <BreakdownByMaterial materials={materialStats} />
         <TopRankedList ranking={userRanking} />
       </ScrollView>
