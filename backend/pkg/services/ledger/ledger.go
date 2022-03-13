@@ -119,18 +119,34 @@ func (s *Service) CalculateEventBoard(
 		return nil, result.Error
 	}
 
+	var goal models.Goal
+
+	result = db.Where("event_id = ?", eventId).First(&goal)
+
+	if result.Error != nil {
+		s.logger.Error().
+			Uint64("event_id", eventId).
+			Err(result.Error).
+			Msg("Failed to fetch Goal")
+
+		return nil, result.Error
+	}
+
 	userIds := make([]uint64, 0, 10)
 
 	result = db.
 		Model(&models.Ledger{}).
 		Where("event_id = ?", eventId).
-		Limit(10).Select("user_id").Find(&userIds)
+		Limit(10).
+		Select("user_id").
+		Find(&userIds)
 
 	if result.Error != nil {
 		s.logger.Error().
 			Uint64("event_id", eventId).
 			Err(result.Error).
 			Msg("Failed to fetch TOP 10 Users IDs")
+
 		return nil, result.Error
 	}
 
@@ -138,19 +154,18 @@ func (s *Service) CalculateEventBoard(
 
 	result = db.Where("id IN ?", userIds).Find(&topRankedUsers)
 
-	if result.Error != nil {
+	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
 		s.logger.Error().
 			Uint64("event_id", eventId).
 			Err(result.Error).
 			Msg("Failed to fetch TOP 10 Users")
 		return nil, result.Error
-
 	}
 
 	exchangeRates := make([]models.ExchangeRate, 0, 10)
 	result = db.Find(&exchangeRates)
 
-	if result.Error != nil {
+	if result.Error != nil && result.Error != gorm.ErrRecordNotFound {
 		s.logger.Error().
 			Err(result.Error).
 			Msg("Failed to fetch exchange rates")
@@ -167,19 +182,6 @@ func (s *Service) CalculateEventBoard(
 		"SELECT exchange_rate_id, SUM(quantity) as quantity FROM ledgers WHERE user_id = ? GROUP BY exchange_rate_id",
 		userId,
 	).Scan(&counts)
-
-	var goal models.Goal
-
-	result = db.Where("event_id = ?", eventId).First(&goal)
-
-	if result.Error != nil {
-		s.logger.Error().
-			Uint64("event_id", eventId).
-			Err(result.Error).
-			Msg("Failed to fetch Goal")
-
-		return nil, result.Error
-	}
 
 	res := &EventBoard{
 		Event:                     event,
