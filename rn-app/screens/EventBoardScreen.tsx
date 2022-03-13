@@ -1,18 +1,24 @@
 import { Text } from '@ui-kitten/components'
 import { ScrollView } from 'react-native'
 import BossHealth from '../components/BossHealth'
-import BreakdownByMaterial, {
-  MaterialStats,
-} from '../components/BreakdownByMaterial'
 import CountdownTimer from '../components/CountdownTimer'
+import IndividualScore from '../components/IndividualBreakdown'
 import ScreenLayout from '../components/ScreenLayout'
 import TopRankedList, { UserRankingStats } from '../components/TopRankedList'
+import GlobalScore, { MaterialScore } from '../components/TotalBreakdown'
 
-const materialStats: MaterialStats[] = [
+const totalScore: MaterialScore[] = [
   { id: 1, icon: 'bulb', name: 'Electronics', points: 200 },
   { id: 2, icon: 'car', name: 'Cars', points: 150 },
   { id: 3, icon: 'umbrella', name: 'Something', points: 20 },
   { id: 4, icon: 'bulb', name: 'Something', points: 10 },
+]
+
+const individualScore: MaterialScore[] = [
+  { id: 1, icon: 'bulb', name: 'Electronics', points: 20 },
+  { id: 2, icon: 'car', name: 'Cars', points: 10 },
+  { id: 3, icon: 'umbrella', name: 'Something', points: 2 },
+  { id: 4, icon: 'bulb', name: 'Something', points: 3 },
 ]
 
 const userRanking: UserRankingStats[] = [
@@ -51,7 +57,8 @@ const EventBoard = () => {
           Očistimo Krnjaču
         </Text>
         <CountdownTimer endTime="2022-03-13T14:00:00.0000" />
-        <BreakdownByMaterial materials={materialStats} />
+        <IndividualScore score={individualScore} />
+        <GlobalScore score={totalScore} />
         <TopRankedList ranking={userRanking} />
       </ScrollView>
     </ScreenLayout>

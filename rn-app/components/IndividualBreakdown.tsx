@@ -2,19 +2,13 @@ import { Icon, Text } from '@ui-kitten/components'
 import { FlatList, StyleSheet, View } from 'react-native'
 import useColorScheme from '../hooks/useColorScheme'
 import { PADDING_X } from './ScreenLayout'
+import { MaterialScore } from './TotalBreakdown'
 
-export type MaterialStats = {
-  id: number
-  name: string
-  points: number
-  icon: string
+type IndividualScoreProps = {
+  score: MaterialScore[]
 }
 
-type BreakdownByMaterialProps = {
-  materials: MaterialStats[]
-}
-
-const BreakdownByMaterial = ({ materials }: BreakdownByMaterialProps) => {
+const IndividualScore = ({ score: materials }: IndividualScoreProps) => {
   const colorScheme = useColorScheme()
   const getThemeColor = (dark: string, light: string) =>
     colorScheme === 'dark' ? dark : light
@@ -24,10 +18,10 @@ const BreakdownByMaterial = ({ materials }: BreakdownByMaterialProps) => {
       ListHeaderComponent={() => (
         <>
           <Text category="h4" style={{ textAlign: 'center', marginTop: 16 }}>
-            Total waste collected
+            My score
           </Text>
           <Text category="s1" style={{ textAlign: 'center', marginTop: 8 }}>
-            This is what we all collected. It's a lot.
+            C'mon keep it up
           </Text>
         </>
       )}
@@ -74,4 +68,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default BreakdownByMaterial
+export default IndividualScore
