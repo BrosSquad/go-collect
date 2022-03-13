@@ -8,6 +8,7 @@ import (
 	"github.com/BrosSquad/go-collect/pkg/http/handlers/achievement"
 	"github.com/BrosSquad/go-collect/pkg/http/handlers/auth"
 	"github.com/BrosSquad/go-collect/pkg/http/handlers/events"
+	"github.com/BrosSquad/go-collect/pkg/http/handlers/ws"
 	"github.com/BrosSquad/go-collect/pkg/http/middleware"
 )
 
@@ -16,7 +17,9 @@ func registerRoutes(c *container.Container, app *fiber.App) {
 	app.Get("/", handlers.HelloWorld())
 
 	app.Get("/user-profile", authMiddleware, handlers.UserProfileMetrics(c.GetLedgerService()))
-	app.Post("/ledger", authMiddleware, handlers.InsertLedger(c.GetLedgerService()))
+	app.Post("/ledger", authMiddleware, handlers.InsertLedger(c.GetLedgerService(), c.GetBroadCaster()))
+
+	app.Get("/ws/:eventId/collection", middleware.WebSocket(), ws.LedgerHandler(c.GetBroadCaster()))
 
 	app.Get("/events", authMiddleware, events.GetEventHandler(c.GetEventService(), c.GetDefaultLogger()))
 	app.Post("/event/:eventId/participate",authMiddleware, events.ParticipantHandler())

@@ -14,6 +14,11 @@ type Service struct {
 	logger zerolog.Logger
 }
 
+type Diff struct {
+	Diff   uint64
+	Ledger models.Ledger
+}
+
 func New(db *gorm.DB, logger zerolog.Logger) *Service {
 	return &Service{
 		db:     db,
@@ -210,7 +215,7 @@ func (s *Service) Insert(
 	exchangeRateId uint64,
 	eventId uint64,
 	quantity uint64,
-) (models.Ledger, error) {
+) (models.Ledger, uint64, error) {
 	db := s.db.WithContext(ctx)
 
 	legder := models.Ledger{
@@ -229,7 +234,7 @@ func (s *Service) Insert(
 			Err(result.Error).
 			Msg("Failed to insert legder")
 
-		return models.Ledger{}, result.Error
+		return models.Ledger{}, 0, result.Error
 	}
 
 	var exchangeRate models.ExchangeRate
@@ -243,7 +248,7 @@ func (s *Service) Insert(
 			Err(result.Error).
 			Msg("Failed to load exchange rate id")
 
-		return models.Ledger{}, result.Error
+		return models.Ledger{}, 0, result.Error
 	}
 
 	newPoints := user.Points + exchangeRate.Modifier*quantity
@@ -259,7 +264,7 @@ func (s *Service) Insert(
 			Err(result.Error).
 			Msg("Failed to change points in user")
 
-		return models.Ledger{}, result.Error
+		return models.Ledger{}, 0, result.Error
 	}
 
 	achievements := make([]models.Achievement, 0, 10)
@@ -273,7 +278,7 @@ func (s *Service) Insert(
 			Err(result.Error).
 			Msg("Failed fetch achievements")
 
-		return models.Ledger{}, result.Error
+		return models.Ledger{}, 0, result.Error
 	}
 
 	err := db.
@@ -287,9 +292,9 @@ func (s *Service) Insert(
 			Err(result.Error).
 			Msg("Failed unlock achievements")
 
-		return models.Ledger{}, result.Error
+		return models.Ledger{}, 0, result.Error
 	}
 
 	// TODO: What to return
-	return legder, nil
+	return legder, exchangeRate.Modifier * quantity, nil
 }
