@@ -11,7 +11,7 @@ const BottomTab = createBottomTabNavigator()
 function AppNavigator() {
   return (
     <BottomTab.Navigator
-      initialRouteName="EventBoard"
+      initialRouteName="Profile"
       screenOptions={{
         tabBarInactiveTintColor: '#1A2138',
         tabBarActiveTintColor: '#fff',

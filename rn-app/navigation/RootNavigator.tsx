@@ -8,11 +8,6 @@ const RootStack = createNativeStackNavigator()
 function RootNavigator() {
   return (
     <RootStack.Navigator>
-      {/* <RootStack.Screen
-        name="AuthLoading"
-        component={LoadingScreen}
-        options={{ headerShown: false }}
-      /> */}
       <RootStack.Screen
         name="Auth"
         component={AuthNavigator}

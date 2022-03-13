@@ -20,7 +20,7 @@ const HPBar = ({ currentHP, maxHP, style }: HPBarProps) => {
   let thumbColor = goCollectTheme['color-danger-500']
 
   const percentage = currentHP / maxHP
-  const thumbWidth = WIDTH * percentage
+  const thumbWidth = WIDTH * (percentage || 0)
 
   if (percentage < 0.6 && percentage > 0.3) {
     // Medium hp left
