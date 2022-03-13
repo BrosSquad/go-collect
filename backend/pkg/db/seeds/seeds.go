@@ -1,6 +1,7 @@
 package seeds
 
 import (
+	"math/rand"
 	"time"
 
 	"gorm.io/gorm"
@@ -140,4 +141,32 @@ func Seed(db *gorm.DB) {
 	seedAchievements(db)
 	seedEvents(db)
 	seedExchangeRates(db)
+	seedGoals(db)
+}
+
+func seedGoals(db *gorm.DB) {
+	data := []models.Goal{
+		{
+			Model:   models.Model{},
+			EventID: 1,
+			Points:  uint64(rand.Int63n(500)),
+		},
+		{
+			Model:   models.Model{},
+			EventID: 1,
+			Points:  uint64(rand.Int63n(150)),
+		},
+		{
+			Model:   models.Model{},
+			EventID: 1,
+			Points:  uint64(rand.Int63n(200)),
+		},
+		{
+			Model:   models.Model{},
+			EventID: 1,
+			Points:  uint64(rand.Int63n(300)),
+		},
+	}
+
+	db.CreateInBatches(data, 10)
 }
