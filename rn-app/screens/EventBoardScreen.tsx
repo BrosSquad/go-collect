@@ -10,7 +10,8 @@ import ScreenLayout from '../components/ScreenLayout'
 import TopRankedList, { UserRankingStats } from '../components/TopRankedList'
 import GlobalScore, { MaterialScore } from '../components/TotalBreakdown'
 import { randomIcon } from '../components/utils'
-import { getEventData, getHeaders } from '../requests'
+import { getEventData } from '../requests'
+import EndGameScreen from './EndGameScreen'
 import LoadingScreen from './LoadingScreen'
 
 /**
@@ -59,11 +60,8 @@ const EventBoard = () => {
 
   useEffect(() => {
     let websocket
-
     ;(async () => {
       const eventID = await AsyncStorage.getItem('event_id')
-      const headers = await getHeaders()
-
       websocket = new WebSocket(
         `ws://139.162.151.127:8080/ws/${eventID}/collection`
       )
@@ -83,13 +81,16 @@ const EventBoard = () => {
 
   if (isLoading) return <LoadingScreen />
 
+  const maxHP = data?.total_points
+  const currentHP = data?.total_points - data?.damage
+  if (currentHP === 0) {
+    return <EndGameScreen />
+  }
+
   return (
     <ScreenLayout omitPadding="all">
       <ScrollView>
-        <BossHealth
-          maxHP={data?.total_points}
-          currentHP={data?.total_points - data?.damage}
-        />
+        <BossHealth maxHP={maxHP} currentHP={currentHP} />
         <Text category="h4" style={{ textAlign: 'center', marginTop: 16 }}>
           {data?.event?.title}
         </Text>
