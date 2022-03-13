@@ -17,10 +17,20 @@ const HPBar = ({ currentHP, maxHP, style }: HPBarProps) => {
     scheme === 'dark' ? dark : light
 
   const trackColor = getThemeColor('#fff', '#222B45')
-  const thumbColor = goCollectTheme['color-primary-500']
+  let thumbColor = goCollectTheme['color-danger-500']
 
-  const ratio = currentHP / maxHP
-  const thumbWidth = WIDTH * ratio
+  const percentage = currentHP / maxHP
+  const thumbWidth = WIDTH * percentage
+
+  console.log('PERCENTAGE', percentage)
+
+  if (percentage < 0.6 && percentage > 0.3) {
+    // Medium hp left
+    thumbColor = goCollectTheme['color-warning-500']
+  } else {
+    // Low hp left
+    thumbColor = goCollectTheme['color-danger-500']
+  }
 
   return (
     <View>
