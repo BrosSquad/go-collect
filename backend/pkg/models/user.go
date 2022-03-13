@@ -9,6 +9,6 @@ type User struct {
 	Points    uint64 `gorm:"column:points" json:"points,omitempty"`
 
 	Tokens []Token
-	Achievements []Achievement `gorm:"many2many:user_achievement;"`
+	Achievements []Achievement `gorm:"many2many:achievement_user;"`
 	Events []Event `gorm:"many2many:participants;"`
 }
