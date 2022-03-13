@@ -12,6 +12,7 @@ export const client = axios.create({
 
 axios.interceptors.request.use(async (config): Promise<AxiosRequestConfig> => {
   const token = await AsyncStorage.getItem('token')
+
   if (token) {
     console.log('Access token found', token)
 
@@ -19,7 +20,7 @@ axios.interceptors.request.use(async (config): Promise<AxiosRequestConfig> => {
       ...config,
       headers: {
         ...config.headers,
-        Authorization: `Bearer ${token}`,
+        Authorization: token,
       },
     }
   }
