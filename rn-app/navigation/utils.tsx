@@ -1,11 +1,41 @@
-import { FontAwesome } from '@expo/vector-icons'
-import * as React from 'react'
+// @ts-nocheck
+import { Icon } from '@ui-kitten/components'
+import { useEffect, useRef } from 'react'
 
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name']
+type TabBarIconProps = {
+  name: string
   color: string
-}) {
-  return <FontAwesome size={30} style={{ marginBottom: -3 }} {...props} />
+  size: number
+  isAnimated?: boolean
+}
+
+function TabBarIcon({
+  name,
+  color,
+  size = 32,
+  isAnimated = false,
+}: TabBarIconProps) {
+  const ref = useRef<Icon>(null)
+
+  useEffect(() => {
+    if (isAnimated) {
+      ref.current?.startAnimation()
+    }
+  }, [isAnimated])
+
+  return (
+    <Icon
+      ref={ref}
+      name={name}
+      fill={color}
+      animation="pulse"
+      animationConfig={{ cycles: Infinity }}
+      style={{
+        width: size,
+        height: size,
+      }}
+    />
+  )
 }
 
 export default TabBarIcon
