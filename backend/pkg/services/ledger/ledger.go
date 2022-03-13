@@ -74,7 +74,10 @@ func (s *Service) CalculateUserMetrics(ctx context.Context, userId uint64) (*Use
 		Quantity       uint64 `gorm:"column:quantity"`
 	}, 0, 10)
 
-	db.Raw("SELECT exchange_rate_id, SUM(quantity) as quantity FROM ledgers WHERE user_id = ?", userId).Scan(&counts)
+	db.Raw(
+		"SELECT exchange_rate_id, SUM(quantity) as quantity FROM ledgers WHERE user_id = ? GROUP BY exchange_rate_id", 
+		userId,
+		).Scan(&counts)
 
 	//result = db.Model(&models.Ledger{}).
 	//	Where("user_id = ?", userId).

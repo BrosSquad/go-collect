@@ -23,6 +23,8 @@ func Auth(service *auth.LoginService, logger zerolog.Logger) fiber.Handler {
 				Err(err).
 				Str("token", token).
 				Msg("Failed to authenticate USER")
+
+			return fiber.ErrUnauthorized
 		}
 
 		c.Locals(constants.SessionUserKey, user)
