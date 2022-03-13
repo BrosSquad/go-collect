@@ -44,6 +44,7 @@ type (
 		TotalPointsByExchangeRate []TotalByExchange `json:"total_points_by_exchange_rate"`
 		Event                     models.Event      `json:"event"`
 		TopRankedUsers            []models.User     `json:"ranked_users"`
+		Damage                    uint64            `json:"damage"`
 	}
 )
 
@@ -188,11 +189,22 @@ func (s *Service) CalculateEventBoard(
 		userId,
 	).Scan(&counts)
 
+	countsDamage := make([]struct {
+		ExchangeRateId uint64 `gorm:"column:exchange_rate_id"`
+		Quantity       uint64 `gorm:"column:quantity"`
+	}, 0, 10)
+
+	db.Raw(
+		"SELECT exchange_rate_id, SUM(quantity) as quantity FROM ledgers WHERE event_id = ? GROUP BY exchange_rate_id",
+		eventId,
+	).Scan(&countsDamage)
+
 	res := &EventBoard{
 		Event:                     event,
 		TopRankedUsers:            topRankedUsers,
 		TotalPoints:               goal.Points,
 		TotalPointsByExchangeRate: make([]TotalByExchange, 0, 10),
+		Damage:                    0,
 	}
 
 	for _, count := range counts {
@@ -202,6 +214,14 @@ func (s *Service) CalculateEventBoard(
 					ExchangeRate: exchangeRate,
 					TotalPoints:  count.Quantity * exchangeRate.Modifier,
 				})
+			}
+		}
+	}
+
+	for _, count := range countsDamage {
+		for _, exchangeRate := range exchangeRates {
+			if count.ExchangeRateId == exchangeRate.ID {
+				res.Damage += count.Quantity * exchangeRate.Modifier
 			}
 		}
 	}
