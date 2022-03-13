@@ -18,11 +18,16 @@ func registerRoutes(c *container.Container, app *fiber.App) {
 
 	app.Get("/user-profile", authMiddleware, handlers.UserProfileMetrics(c.GetLedgerService()))
 	app.Post("/ledger", authMiddleware, handlers.InsertLedger(c.GetLedgerService(), c.GetBroadCaster()))
-	app.Post("/event/:eventId/participate",  authMiddleware, events.InsertParticipent(c.GetParticipantService()))
-	app.Get("/ws/:eventId/collection", authMiddleware, middleware.WebSocket(), ws.LedgerHandler(c.GetBroadCaster(), c.GetDefaultLogger()))
+	app.Post("/event/:eventId/participate", authMiddleware, events.InsertParticipent(c.GetParticipantService()))
+
+	app.Get("/ws/:eventId/collection",
+		authMiddleware,
+		middleware.WebSocket(),
+		ws.LedgerHandler(c.GetBroadCaster(), c.GetDefaultLogger()),
+	)
 
 	app.Get("/events", authMiddleware, events.GetEventHandler(c.GetEventService(), c.GetDefaultLogger()))
-	app.Get("/event/:eventId/participate",authMiddleware, events.ParticipantHandler())
+	app.Get("/event/:eventId/participate", authMiddleware, events.ParticipantHandler())
 	app.Get("/event/:eventId/board", authMiddleware, handlers.EventBoard(c.GetLedgerService()))
 	app.Get("/exchange-rates", handlers.ExchangeRateHandler(c.GetExchangeRateService(), c.GetDefaultLogger()))
 	app.Get("/achievements", achievement.AchievementHandler(c.GetAchievementService(), c.GetDefaultLogger()))

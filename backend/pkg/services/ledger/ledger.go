@@ -33,6 +33,7 @@ type (
 	}
 
 	UserMetrics struct {
+		User                      models.User          `json:"user"`
 		TotalPoints               uint64               `json:"total_points"`
 		TotalPointsByExchangeRate []TotalByExchange    `json:"total_points_by_exchange_rate"`
 		Achievements              []models.Achievement `json:"achievement"`
@@ -40,12 +41,12 @@ type (
 	}
 
 	EventBoard struct {
-		TotalPoints               uint64            `json:"total_points"`
-		TotalPointsByExchangeRate []TotalByExchange `json:"total_points_by_exchange_rate"`
+		TotalPoints                  uint64            `json:"total_points"`
+		TotalPointsByExchangeRate    []TotalByExchange `json:"total_points_by_exchange_rate"`
 		TotalPointsByExchangeRateAll []TotalByExchange `json:"total_points_by_exchange_rate_all"`
-		Event                     models.Event      `json:"event"`
-		TopRankedUsers            []models.User     `json:"ranked_users"`
-		Damage                    uint64            `json:"damage"`
+		Event                        models.Event      `json:"event"`
+		TopRankedUsers               []models.User     `json:"ranked_users"`
+		Damage                       uint64            `json:"damage"`
 	}
 )
 
@@ -71,6 +72,7 @@ func (s *Service) CalculateUserMetrics(ctx context.Context, userId uint64) (*Use
 		Events:                    user.Events,
 		Achievements:              user.Achievements,
 		TotalPointsByExchangeRate: make([]TotalByExchange, 0, 10),
+		User:                      user,
 	}
 
 	exchangeRates := make([]models.ExchangeRate, 0, 10)
@@ -201,12 +203,12 @@ func (s *Service) CalculateEventBoard(
 	).Scan(&countsDamage)
 
 	res := &EventBoard{
-		Event:                     event,
-		TopRankedUsers:            topRankedUsers,
-		TotalPoints:               goal.Points,
-		TotalPointsByExchangeRate: make([]TotalByExchange, 0, 10),
+		Event:                        event,
+		TopRankedUsers:               topRankedUsers,
+		TotalPoints:                  goal.Points,
+		TotalPointsByExchangeRate:    make([]TotalByExchange, 0, 10),
 		TotalPointsByExchangeRateAll: make([]TotalByExchange, 0, 10),
-		Damage:                    0,
+		Damage:                       0,
 	}
 
 	for _, count := range counts {
