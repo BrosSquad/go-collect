@@ -1,9 +1,10 @@
 import { Layout } from '@ui-kitten/components'
+import { ReactNode } from 'react'
 import { ViewStyle } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 type ScreenLayoutProps = {
-  children: JSX.Element
+  children: ReactNode
   style?: ViewStyle
 }
 
