@@ -18,6 +18,7 @@ const EventBoard = () => {
   const { data, isLoading } = useQuery('eventData', getEventData)
   const [currentHP, setCurrentHP] = useState(() => {
     const nextVal = data?.total_points - data?.damage
+    console.log(nextVal)
     return isNaN(nextVal) ? data?.total_points : nextVal
   })
 
