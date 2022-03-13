@@ -18,7 +18,6 @@ function AuthNavigator() {
         component={LoginScreen}
         options={{ headerShown: false }}
       />
-      {/* Other auth related screens go here */}
     </AuthStack.Navigator>
   )
 }

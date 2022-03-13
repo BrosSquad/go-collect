@@ -1,3 +1,4 @@
+import { useNavigation } from '@react-navigation/native'
 import {
   Avatar,
   Button,
@@ -15,6 +16,7 @@ import {
 } from 'react-native'
 import ScreenLayout, { PADDING_X } from '../components/ScreenLayout'
 import { goCollectTheme } from '../go-collect-theme'
+import useAuth from '../hooks/useAuth'
 
 type Achievement = {
   id: number
@@ -58,6 +60,8 @@ const achievements: Achievement[] = [
 const ProfileScreen = () => {
   const [tooltipActiveId, setTooltipActiveId] = useState<number>()
   const isVisible = (id: number) => tooltipActiveId === id
+  const { clearCredentials } = useAuth()
+  const navigation = useNavigation<any>()
 
   useEffect(() => {
     if (tooltipActiveId) {
@@ -66,6 +70,11 @@ const ProfileScreen = () => {
       }, 2000)
     }
   }, [tooltipActiveId])
+
+  const onLogout = async () => {
+    clearCredentials()
+    navigation.navigate('Login')
+  }
 
   return (
     <ScreenLayout omitPadding="y">
@@ -135,7 +144,9 @@ const ProfileScreen = () => {
           ))}
         </View>
 
-        <Button status="danger">Logout</Button>
+        <Button status="danger" onPress={onLogout}>
+          Logout
+        </Button>
       </ScrollView>
     </ScreenLayout>
   )
