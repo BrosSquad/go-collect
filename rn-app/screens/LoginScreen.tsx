@@ -22,7 +22,6 @@ const LoginScreen = () => {
       navigation.navigate('App')
     },
     onError: (error) => {
-      console.log('Error', error)
       setHasError(true)
     },
   })

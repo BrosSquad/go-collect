@@ -1,10 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { MutateFunction } from 'react-query'
 import { LoginRequest, LoginResponse } from './types/login_pb'
+import { UserProfileResponse } from './types/profile'
 import { EventDataResponse } from './types/types'
 
 const getURL = (endpoint: string) => `http://139.162.151.127:8080${endpoint}`
-const getHeaders = async () => {
+export const getHeaders = async () => {
   const headers = {
     Accept: 'application/json',
     'Content-Type': 'application/json',
@@ -55,16 +56,24 @@ export const checkInRequest: MutateFunction<
   return response.json()
 }
 
-export const getAchievements = async () => {
-  // return await client.get<{ data: AchievementResponse }>('/achievements')
+export const getProfile = async () => {
+  const response = await fetch(getURL(`/user-profile`), {
+    headers: await getHeaders(),
+  })
+
+  if (!response.ok) {
+    throw new Error('getProfile failed')
+  }
+
+  return response.json() as Promise<UserProfileResponse>
 }
 
 export const get = async () => {
   // return await client.get<ExchangeRateResponse>('/exchange-rates')
 }
 
-export const getEventData = async ({ eventID }: { eventID: string }) => {
-  console.log('getEventData', eventID)
+export const getEventData = async () => {
+  const eventID = await AsyncStorage.getItem('event_id')
 
   const response = await fetch(getURL(`/event/${eventID}/board`), {
     headers: await getHeaders(),

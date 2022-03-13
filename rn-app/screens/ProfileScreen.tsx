@@ -8,15 +8,19 @@ import {
   Text,
   Tooltip,
 } from '@ui-kitten/components'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   ScrollView,
   StyleSheet,
   TouchableWithoutFeedback,
   View,
 } from 'react-native'
+import { useQuery } from 'react-query'
 import ScreenLayout, { PADDING_X } from '../components/ScreenLayout'
+import { randomColor, randomIcon } from '../components/utils'
 import { goCollectTheme } from '../go-collect-theme'
+import { getProfile } from '../requests'
+import LoadingScreen from './LoadingScreen'
 
 type Achievement = {
   id: number
@@ -26,41 +30,11 @@ type Achievement = {
   description: string
 }
 
-const achievements: Achievement[] = [
-  {
-    id: 1,
-    icon: 'bulb',
-    label: 'EMP Cleaner',
-    description: 'Collected more than 3k PTS of electric waste.',
-    background: 'color-danger-400',
-  },
-  {
-    id: 2,
-    icon: 'sync',
-    label: 'Plastic Devourer',
-    description: 'Collected more than 3k PTS of plastic waste.',
-    background: 'color-warning-400',
-  },
-  {
-    id: 3,
-    icon: 'shield',
-    label: 'Heavy weight',
-    description: 'Helped carry more than 2k of any waste',
-    background: 'color-info-400',
-  },
-  {
-    id: 4,
-    icon: 'shield',
-    label: 'Heavy weight',
-    description: 'Helped carry more than 2k of any waste',
-    background: 'color-info-400',
-  },
-]
-
 const ProfileScreen = () => {
   const [tooltipActiveId, setTooltipActiveId] = useState<number>()
   const isVisible = (id: number) => tooltipActiveId === id
   const navigation = useNavigation<any>()
+  const { data, isLoading } = useQuery('profile', getProfile)
 
   useEffect(() => {
     if (tooltipActiveId) {
@@ -75,6 +49,23 @@ const ProfileScreen = () => {
     navigation.navigate('Login')
   }
 
+  if (isLoading) {
+    return <LoadingScreen />
+  }
+
+  const background = useMemo(() => randomColor(), [])
+  const icon = useMemo(() => randomIcon(), [])
+
+  const achievements = data?.achievement?.map(
+    (a): Achievement => ({
+      id: a.id,
+      background,
+      description: a.description,
+      icon,
+      label: a.name,
+    })
+  )
+
   return (
     <ScreenLayout omitPadding="y">
       <ScrollView style={{ paddingTop: PADDING_X + 16 }}>
@@ -88,7 +79,7 @@ const ProfileScreen = () => {
               Jaksa Malisic
             </Text>
             <Text category="s1" style={{ marginLeft: 16 }}>
-              @jaksm, Belgrade
+              @{data?.user?.username}, {data?.user?.city}
             </Text>
           </View>
         </View>
@@ -98,7 +89,7 @@ const ProfileScreen = () => {
             <Icon name="star" fill="#fff" style={{ width: 64, height: 64 }} />
           </View>
           <Text category="h6" style={{ marginTop: 8 }}>
-            6.500
+            {data?.user?.points}
           </Text>
           <Text category="s1" style={{ marginTop: 8 }}>
             PTS

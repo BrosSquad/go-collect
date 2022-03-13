@@ -10,7 +10,6 @@ const IntroScreen = () => {
   const { sequencerConfig, next, isLast } = useSequencer({
     items: introSequence,
     onSequenceEnd: async () => {
-      console.log('End')
       AsyncStorage.setItem('seenIntro', JSON.stringify(true))
       navigation.navigate('Login')
     },

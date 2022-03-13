@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Text } from '@ui-kitten/components'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { ScrollView } from 'react-native'
 import { useQuery } from 'react-query'
 import BossHealth from '../components/BossHealth'
@@ -9,87 +9,94 @@ import IndividualScore from '../components/IndividualBreakdown'
 import ScreenLayout from '../components/ScreenLayout'
 import TopRankedList, { UserRankingStats } from '../components/TopRankedList'
 import GlobalScore, { MaterialScore } from '../components/TotalBreakdown'
-import { getEventData } from '../requests'
+import { randomIcon } from '../components/utils'
+import { getEventData, getHeaders } from '../requests'
+import LoadingScreen from './LoadingScreen'
 
-const totalScore: MaterialScore[] = [
-  { id: 1, icon: 'bulb', name: 'Electronics', points: 200 },
-  { id: 2, icon: 'car', name: 'Cars', points: 150 },
-  { id: 3, icon: 'umbrella', name: 'Something', points: 20 },
-  { id: 4, icon: 'bulb', name: 'Something', points: 10 },
-]
+/**
+ 
+{
+    refetchInterval: 2 * 1000,
+  }
 
-const individualScore: MaterialScore[] = [
-  { id: 1, icon: 'bulb', name: 'Electronics', points: 20 },
-  { id: 2, icon: 'car', name: 'Cars', points: 10 },
-  { id: 3, icon: 'umbrella', name: 'Something', points: 2 },
-  { id: 4, icon: 'bulb', name: 'Something', points: 3 },
-]
-
-const userRanking: UserRankingStats[] = [
-  {
-    id: 1,
-    avatarURL: 'https://i.pravatar.cc/100',
-    name: 'Stefan Bogdanovic',
-    points: 399656,
-  },
-  {
-    id: 2,
-    avatarURL: 'https://i.pravatar.cc/100',
-    name: 'Dusan Malusev',
-    points: 26565,
-  },
-  {
-    id: 3,
-    avatarURL: 'https://i.pravatar.cc/100',
-    name: 'Dusan Mitrovic',
-    points: 123132,
-  },
-  {
-    id: 4,
-    avatarURL: 'https://i.pravatar.cc/100',
-    name: 'Jaksa Malisic',
-    points: 1312,
-  },
-]
+ */
 
 const EventBoard = () => {
-  const [eventID, setEventID] = useState<string | null>()
-  const { data, isError, isLoading } = useQuery(
-    'eventData',
-    () => getEventData({ eventID }),
-    {
-      enabled: !!eventID,
+  const { data, isLoading } = useQuery('eventData', getEventData)
+
+  const icons = useMemo(() => [randomIcon(), randomIcon()], [])
+
+  const individualScore = data?.total_points_by_exchange_rate.map(
+    (pt): MaterialScore => {
+      return {
+        icon: icons[0],
+        id: pt?.exchange_rate?.id,
+        name: pt.exchange_rate?.name,
+        points: pt?.total_points,
+      }
     }
   )
 
+  const totalScore = data?.total_points_by_exchange_rate_all?.map(
+    (pt): MaterialScore => {
+      return {
+        icon: icons[1],
+        id: pt?.exchange_rate?.id,
+        name: pt.exchange_rate?.name,
+        points: pt?.total_points,
+      }
+    }
+  )
+
+  const topPlayers = data?.ranked_users?.map(
+    (user): UserRankingStats => ({
+      avatarURL: 'https://i.pravatar.cc/100',
+      id: user.id,
+      name: user.username,
+      points: user.points,
+    })
+  )
+
   useEffect(() => {
+    let websocket
+
     ;(async () => {
-      const event_id = await AsyncStorage.getItem('event_id')
-      if (event_id) {
-        setEventID(event_id)
-      } else {
-        setEventID(null)
+      const eventID = await AsyncStorage.getItem('event_id')
+      const headers = await getHeaders()
+
+      websocket = new WebSocket(
+        `ws://139.162.151.127:8080/ws/${eventID}/collection`
+      )
+      websocket.onopen = () => {
+        console.log('connected')
+      }
+      websocket.onmessage = (event) => {
+        const data = JSON.parse(event.data)
+        console.log('ws', data)
       }
     })()
+
+    return () => {
+      websocket.close()
+    }
   }, [])
 
-  console.log({
-    isLoading,
-    isError,
-    data,
-  })
+  if (isLoading) return <LoadingScreen />
 
   return (
     <ScreenLayout omitPadding="all">
       <ScrollView>
-        <BossHealth maxHP={1000} currentHP={300} />
+        <BossHealth
+          maxHP={data?.total_points}
+          currentHP={data?.total_points - data?.damage}
+        />
         <Text category="h4" style={{ textAlign: 'center', marginTop: 16 }}>
-          Očistimo Dorcol
+          {data?.event?.title}
         </Text>
-        <CountdownTimer endTime="2022-03-13T14:00:00.0000" />
+        <CountdownTimer endTime={data?.event?.end} />
         <IndividualScore score={individualScore} />
         <GlobalScore score={totalScore} />
-        <TopRankedList ranking={userRanking} />
+        <TopRankedList ranking={topPlayers} />
       </ScrollView>
     </ScreenLayout>
   )
