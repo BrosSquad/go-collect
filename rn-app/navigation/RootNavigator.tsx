@@ -6,11 +6,15 @@ import AuthNavigator from './AuthNavigator'
 const RootStack = createNativeStackNavigator()
 
 function RootNavigator() {
-  const isAuthenticated = false
+  const isAuthenticated = true
   return (
     <RootStack.Navigator>
       {isAuthenticated ? (
-        <RootStack.Screen name="App" component={AppNavigator} />
+        <RootStack.Screen
+          name="App"
+          component={AppNavigator}
+          options={{ headerShown: false }}
+        />
       ) : (
         <RootStack.Screen
           name="Auth"
