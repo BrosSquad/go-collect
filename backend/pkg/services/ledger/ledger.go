@@ -42,6 +42,7 @@ type (
 	EventBoard struct {
 		TotalPoints               uint64            `json:"total_points"`
 		TotalPointsByExchangeRate []TotalByExchange `json:"total_points_by_exchange_rate"`
+		TotalPointsByExchangeRateAll []TotalByExchange `json:"total_points_by_exchange_rate_all"`
 		Event                     models.Event      `json:"event"`
 		TopRankedUsers            []models.User     `json:"ranked_users"`
 		Damage                    uint64            `json:"damage"`
@@ -204,6 +205,7 @@ func (s *Service) CalculateEventBoard(
 		TopRankedUsers:            topRankedUsers,
 		TotalPoints:               goal.Points,
 		TotalPointsByExchangeRate: make([]TotalByExchange, 0, 10),
+		TotalPointsByExchangeRateAll: make([]TotalByExchange, 0, 10),
 		Damage:                    0,
 	}
 
@@ -222,6 +224,10 @@ func (s *Service) CalculateEventBoard(
 		for _, exchangeRate := range exchangeRates {
 			if count.ExchangeRateId == exchangeRate.ID {
 				res.Damage += count.Quantity * exchangeRate.Modifier
+				res.TotalPointsByExchangeRateAll = append(res.TotalPointsByExchangeRateAll, TotalByExchange{
+					ExchangeRate: exchangeRate,
+					TotalPoints:  count.Quantity * exchangeRate.Modifier,
+				})
 			}
 		}
 	}
