@@ -102,6 +102,10 @@ func (s *Service) CalculateUserMetrics(ctx context.Context, userId uint64) (*Use
 	return res, nil
 }
 
+func (s *Service) CalculateEventBoard(ctx context.Context, userId, eventId uint64) {
+
+}
+
 func (s *Service) Insert(
 	ctx context.Context,
 	user models.User,
