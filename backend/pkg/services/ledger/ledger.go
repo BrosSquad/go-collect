@@ -33,6 +33,7 @@ type (
 	}
 
 	UserMetrics struct {
+		User                      models.User          `json:"user"`
 		TotalPoints               uint64               `json:"total_points"`
 		TotalPointsByExchangeRate []TotalByExchange    `json:"total_points_by_exchange_rate"`
 		Achievements              []models.Achievement `json:"achievement"`
@@ -40,10 +41,12 @@ type (
 	}
 
 	EventBoard struct {
-		TotalPoints               uint64            `json:"total_points"`
-		TotalPointsByExchangeRate []TotalByExchange `json:"total_points_by_exchange_rate"`
-		Event                     models.Event      `json:"event"`
-		TopRankedUsers            []models.User     `json:"ranked_users"`
+		TotalPoints                  uint64            `json:"total_points"`
+		TotalPointsByExchangeRate    []TotalByExchange `json:"total_points_by_exchange_rate"`
+		TotalPointsByExchangeRateAll []TotalByExchange `json:"total_points_by_exchange_rate_all"`
+		Event                        models.Event      `json:"event"`
+		TopRankedUsers               []models.User     `json:"ranked_users"`
+		Damage                       uint64            `json:"damage"`
 	}
 )
 
@@ -69,6 +72,7 @@ func (s *Service) CalculateUserMetrics(ctx context.Context, userId uint64) (*Use
 		Events:                    user.Events,
 		Achievements:              user.Achievements,
 		TotalPointsByExchangeRate: make([]TotalByExchange, 0, 10),
+		User:                      user,
 	}
 
 	exchangeRates := make([]models.ExchangeRate, 0, 10)
@@ -188,17 +192,41 @@ func (s *Service) CalculateEventBoard(
 		userId,
 	).Scan(&counts)
 
+	countsDamage := make([]struct {
+		ExchangeRateId uint64 `gorm:"column:exchange_rate_id"`
+		Quantity       uint64 `gorm:"column:quantity"`
+	}, 0, 10)
+
+	db.Raw(
+		"SELECT exchange_rate_id, SUM(quantity) as quantity FROM ledgers WHERE event_id = ? GROUP BY exchange_rate_id",
+		eventId,
+	).Scan(&countsDamage)
+
 	res := &EventBoard{
-		Event:                     event,
-		TopRankedUsers:            topRankedUsers,
-		TotalPoints:               goal.Points,
-		TotalPointsByExchangeRate: make([]TotalByExchange, 0, 10),
+		Event:                        event,
+		TopRankedUsers:               topRankedUsers,
+		TotalPoints:                  goal.Points,
+		TotalPointsByExchangeRate:    make([]TotalByExchange, 0, 10),
+		TotalPointsByExchangeRateAll: make([]TotalByExchange, 0, 10),
+		Damage:                       0,
 	}
 
 	for _, count := range counts {
 		for _, exchangeRate := range exchangeRates {
 			if count.ExchangeRateId == exchangeRate.ID {
 				res.TotalPointsByExchangeRate = append(res.TotalPointsByExchangeRate, TotalByExchange{
+					ExchangeRate: exchangeRate,
+					TotalPoints:  count.Quantity * exchangeRate.Modifier,
+				})
+			}
+		}
+	}
+
+	for _, count := range countsDamage {
+		for _, exchangeRate := range exchangeRates {
+			if count.ExchangeRateId == exchangeRate.ID {
+				res.Damage += count.Quantity * exchangeRate.Modifier
+				res.TotalPointsByExchangeRateAll = append(res.TotalPointsByExchangeRateAll, TotalByExchange{
 					ExchangeRate: exchangeRate,
 					TotalPoints:  count.Quantity * exchangeRate.Modifier,
 				})
