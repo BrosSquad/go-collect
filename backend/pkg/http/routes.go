@@ -22,7 +22,7 @@ func registerRoutes(c *container.Container, app *fiber.App) {
 	app.Get("/ws/:eventId/collection", authMiddleware, middleware.WebSocket(), ws.LedgerHandler(c.GetBroadCaster()))
 
 	app.Get("/events", authMiddleware, events.GetEventHandler(c.GetEventService(), c.GetDefaultLogger()))
-	app.Post("/event/:eventId/participate",authMiddleware, events.ParticipantHandler())
+	app.Get("/event/:eventId/participate",authMiddleware, events.ParticipantHandler())
 	app.Get("/event/:eventId/board", authMiddleware, handlers.EventBoard(c.GetLedgerService()))
 	app.Get("/exchange-rates", handlers.ExchangeRateHandler(c.GetExchangeRateService(), c.GetDefaultLogger()))
 	app.Get("/achievements", achievement.AchievementHandler(c.GetAchievementService(), c.GetDefaultLogger()))
