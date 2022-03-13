@@ -35,7 +35,10 @@ type (
 	}
 
 	EventBoard struct {
-
+		TotalPoints               uint64            `json:"total_points"`
+		TotalPointsByExchangeRate []TotalByExchange `json:"total_points_by_exchange_rate"`
+		Event                     models.Event      `json:"event"`
+		TopRankedUsers            []models.User     `json:"ranked_users"`
 	}
 )
 
@@ -81,21 +84,7 @@ func (s *Service) CalculateUserMetrics(ctx context.Context, userId uint64) (*Use
 	db.Raw(
 		"SELECT exchange_rate_id, SUM(quantity) as quantity FROM ledgers WHERE user_id = ? GROUP BY exchange_rate_id",
 		userId,
-		).Scan(&counts)
-
-	//result = db.Model(&models.Ledger{}).
-	//	Where("user_id = ?", userId).
-	//	Group("exchange_rate_id").
-	//	Select("exchange_rate_id", "SUM(quantity) as quantity").
-	//	Find(counts)
-	//
-	//if result.Error != nil {
-	//	s.logger.Error().
-	//		Err(result.Error).
-	//		Msg("Failed to fetch user metrics")
-	//
-	//	return nil, result.Error
-	//}
+	).Scan(&counts)
 
 	for _, count := range counts {
 		for _, exchangeRate := range exchangeRates {
@@ -111,8 +100,95 @@ func (s *Service) CalculateUserMetrics(ctx context.Context, userId uint64) (*Use
 	return res, nil
 }
 
-func (s *Service) CalculateEventBoard(ctx context.Context, userId, eventId uint64) {
+func (s *Service) CalculateEventBoard(
+	ctx context.Context,
+	userId,
+	eventId uint64,
+) (*EventBoard, error) {
+	db := s.db.WithContext(ctx)
 
+	var event models.Event
+
+	result := db.Where(&event).First(&event)
+
+	if result.Error != nil {
+		s.logger.Error().
+			Uint64("event_id", eventId).
+			Err(result.Error).
+			Msg("Failed to fetch Event by ID")
+		return nil, result.Error
+	}
+
+	topRankedUsers := make([]models.User, 0, 10)
+
+	result = db.
+		Model(&models.Ledger{}).
+		Preload("Users").
+		Where("event_id = ?", eventId).
+		Limit(10).
+		Find(&topRankedUsers)
+
+	if result.Error != nil {
+		s.logger.Error().
+			Uint64("event_id", eventId).
+			Err(result.Error).
+			Msg("Failed to fetch TOP 10 Users")
+		return nil, result.Error
+	}
+
+	exchangeRates := make([]models.ExchangeRate, 0, 10)
+	result = db.Find(&exchangeRates)
+
+	if result.Error != nil {
+		s.logger.Error().
+			Err(result.Error).
+			Msg("Failed to fetch exchange rates")
+
+		return nil, result.Error
+	}
+
+	counts := make([]struct {
+		ExchangeRateId uint64 `gorm:"column:exchange_rate_id"`
+		Quantity       uint64 `gorm:"column:quantity"`
+	}, 0, 10)
+
+	db.Raw(
+		"SELECT exchange_rate_id, SUM(quantity) as quantity FROM ledgers WHERE user_id = ? GROUP BY exchange_rate_id",
+		userId,
+	).Scan(&counts)
+
+	var goal models.Goal
+
+	result = db.Where("event_id = ?", eventId).First(&goal)
+
+	if result.Error != nil {
+		s.logger.Error().
+			Uint64("event_id", eventId).
+			Err(result.Error).
+			Msg("Failed to fetch Goal")
+
+		return nil, result.Error
+	}
+
+	res := &EventBoard{
+		Event:                     event,
+		TopRankedUsers:            topRankedUsers,
+		TotalPoints:               goal.Points,
+		TotalPointsByExchangeRate: make([]TotalByExchange, 0, 10),
+	}
+
+	for _, count := range counts {
+		for _, exchangeRate := range exchangeRates {
+			if count.ExchangeRateId == exchangeRate.ID {
+				res.TotalPointsByExchangeRate = append(res.TotalPointsByExchangeRate, TotalByExchange{
+					ExchangeRate: exchangeRate,
+					TotalPoints:  count.Quantity * exchangeRate.Modifier,
+				})
+			}
+		}
+	}
+
+	return res, nil
 }
 
 func (s *Service) Insert(

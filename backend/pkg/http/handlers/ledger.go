@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 
@@ -34,5 +35,27 @@ func InsertLedger(ledgerService *ledger.Service) fiber.Handler {
 		}
 
 		return c.Status(http.StatusCreated).JSON(ledgerModel)
+	}
+}
+
+
+func EventBoard(ledgerService *ledger.Service) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		user := c.Locals(constants.SessionUserKey).(models.User)
+
+		eventIdStr := c.Params("eventId")
+		eventId, err := strconv.ParseUint(eventIdStr, 10, 64)
+
+		if err != nil {
+			return err
+		}
+
+		l, err := ledgerService.CalculateEventBoard(c.UserContext(), user.ID, eventId)
+
+		if err != nil {
+			return err
+		}
+
+		return c.Status(http.StatusOK).JSON(l)
 	}
 }
