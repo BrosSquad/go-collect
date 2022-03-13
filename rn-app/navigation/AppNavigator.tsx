@@ -1,55 +1,50 @@
-import { FontAwesome } from '@expo/vector-icons'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import * as React from 'react'
-import { Pressable } from 'react-native'
-import Colors from '../constants/Colors'
+import { goCollectTheme } from '../go-collect-theme'
 import useColorScheme from '../hooks/useColorScheme'
+import EventBoardScreen from '../screens/EventBoardScreen'
 import TabOneScreen from '../screens/TabOneScreen'
 import TabTwoScreen from '../screens/TabTwoScreen'
-import { RootTabParamList, RootTabScreenProps } from '../types'
 import TabBarIcon from './utils'
 
-const BottomTab = createBottomTabNavigator<RootTabParamList>()
+const BottomTab = createBottomTabNavigator()
 
 function AppNavigator() {
   const colorScheme = useColorScheme()
+  const getThemeColor = (dark: string, light: string) =>
+    colorScheme === 'dark' ? dark : light
 
   return (
     <BottomTab.Navigator
-      initialRouteName="TabOne"
+      initialRouteName="EventBoard"
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme].tint,
+        tabBarInactiveTintColor: '#1A2138',
+        tabBarActiveTintColor: '#fff',
+        tabBarStyle: {
+          backgroundColor: goCollectTheme['color-primary-400'],
+          height: 100,
+          borderTopLeftRadius: 32,
+          borderTopRightRadius: 32,
+        },
       }}
     >
+      <BottomTab.Screen name="TabOne" component={TabOneScreen} />
       <BottomTab.Screen
-        name="TabOne"
-        component={TabOneScreen}
-        options={({ navigation }: RootTabScreenProps<'TabOne'>) => ({
-          title: 'Tab One',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          headerRight: () => (
-            <Pressable
-              onPress={() => navigation.navigate('Modal')}
-              style={({ pressed }) => ({
-                opacity: pressed ? 0.5 : 1,
-              })}
-            >
-              <FontAwesome
-                name="info-circle"
-                size={25}
-                color={Colors[colorScheme].text}
-                style={{ marginRight: 15 }}
-              />
-            </Pressable>
+        name="EventBoard"
+        component={EventBoardScreen}
+        options={{
+          title: 'Event',
+          headerShown: false,
+          tabBarIcon: (props) => (
+            <TabBarIcon name="radio-button-on-outline" {...props} isAnimated />
           ),
-        })}
+        }}
       />
       <BottomTab.Screen
         name="TabTwo"
         component={TabTwoScreen}
         options={{
           title: 'Tab Two',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
         }}
       />
     </BottomTab.Navigator>
