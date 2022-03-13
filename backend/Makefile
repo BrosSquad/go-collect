@@ -24,6 +24,7 @@ endif
 	@cp ./config.example.yml bin/config.yml
 	@cp ./go-collect.service bin/go-collect.service
 	@cp ./docker-compose.yml bin/docker-compose.yml
+	@cp -r ./migrations/ bin/migrations
 
 .PHONY: zip
 zip:
