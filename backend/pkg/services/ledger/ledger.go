@@ -119,14 +119,24 @@ func (s *Service) CalculateEventBoard(
 		return nil, result.Error
 	}
 
-	topRankedUsers := make([]models.User, 0, 10)
+	userIds := make([]uint64, 0, 10)
 
 	result = db.
 		Model(&models.Ledger{}).
-		Preload("Users").
 		Where("event_id = ?", eventId).
-		Limit(10).
-		Find(&topRankedUsers)
+		Limit(10).Select("user_id").Find(&userIds)
+
+	if result.Error != nil {
+		s.logger.Error().
+			Uint64("event_id", eventId).
+			Err(result.Error).
+			Msg("Failed to fetch TOP 10 Users IDs")
+		return nil, result.Error
+	}
+
+	topRankedUsers := make([]models.User, 0, 10)
+
+	result = db.Where("id IN ?", userIds).Find(&topRankedUsers)
 
 	if result.Error != nil {
 		s.logger.Error().
@@ -134,6 +144,7 @@ func (s *Service) CalculateEventBoard(
 			Err(result.Error).
 			Msg("Failed to fetch TOP 10 Users")
 		return nil, result.Error
+
 	}
 
 	exchangeRates := make([]models.ExchangeRate, 0, 10)
