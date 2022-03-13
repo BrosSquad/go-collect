@@ -39,22 +39,20 @@ export const loginRequest: MutateFunction<
 }
 
 export const checkInRequest: MutateFunction<
-  never,
+  { event_id: number },
   any,
-  { event_id: number }
+  { event_id: string }
 > = async ({ event_id }) => {
   const response = await fetch(getURL(`/event/${event_id}/participate`), {
     method: 'POST',
     headers: await getHeaders(),
   })
 
-  console.log(response.status)
-
-  if (response.status > 200 && response.status < 300) {
+  if (!response.ok) {
     throw new Error('checkInRequest failed')
   }
 
-  return response.json() as never
+  return response.json()
 }
 
 export const getAchievements = async () => {
@@ -65,7 +63,9 @@ export const get = async () => {
   // return await client.get<ExchangeRateResponse>('/exchange-rates')
 }
 
-export const getEventData = async ({ eventID }: { eventID: number }) => {
+export const getEventData = async ({ eventID }: { eventID: string }) => {
+  console.log('getEventData', eventID)
+
   const response = await fetch(getURL(`/event/${eventID}/board`), {
     headers: await getHeaders(),
   })
