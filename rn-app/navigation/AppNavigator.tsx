@@ -1,19 +1,14 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import * as React from 'react'
 import { goCollectTheme } from '../go-collect-theme'
-import useColorScheme from '../hooks/useColorScheme'
+import CheckInScreen from '../screens/CheckInScreen'
 import EventBoardScreen from '../screens/EventBoardScreen'
 import TabOneScreen from '../screens/TabOneScreen'
-import TabTwoScreen from '../screens/TabTwoScreen'
 import TabBarIcon from './utils'
 
 const BottomTab = createBottomTabNavigator()
 
 function AppNavigator() {
-  const colorScheme = useColorScheme()
-  const getThemeColor = (dark: string, light: string) =>
-    colorScheme === 'dark' ? dark : light
-
   return (
     <BottomTab.Navigator
       initialRouteName="EventBoard"
@@ -28,7 +23,16 @@ function AppNavigator() {
         },
       }}
     >
-      <BottomTab.Screen name="TabOne" component={TabOneScreen} />
+      <BottomTab.Screen
+        name="CheckIn"
+        component={CheckInScreen}
+        options={{
+          title: 'Check-in',
+          headerShown: false,
+          // upload
+          tabBarIcon: (props) => <TabBarIcon name="upload" {...props} />,
+        }}
+      />
       <BottomTab.Screen
         name="EventBoard"
         component={EventBoardScreen}
@@ -40,13 +44,7 @@ function AppNavigator() {
           ),
         }}
       />
-      <BottomTab.Screen
-        name="TabTwo"
-        component={TabTwoScreen}
-        options={{
-          title: 'Tab Two',
-        }}
-      />
+      <BottomTab.Screen name="TabOne" component={TabOneScreen} />
     </BottomTab.Navigator>
   )
 }
