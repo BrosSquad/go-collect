@@ -1,11 +1,15 @@
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Text } from '@ui-kitten/components'
+import { useEffect, useState } from 'react'
 import { ScrollView } from 'react-native'
+import { useQuery } from 'react-query'
 import BossHealth from '../components/BossHealth'
 import CountdownTimer from '../components/CountdownTimer'
 import IndividualScore from '../components/IndividualBreakdown'
 import ScreenLayout from '../components/ScreenLayout'
 import TopRankedList, { UserRankingStats } from '../components/TopRankedList'
 import GlobalScore, { MaterialScore } from '../components/TotalBreakdown'
+import { getEventData } from '../requests'
 
 const totalScore: MaterialScore[] = [
   { id: 1, icon: 'bulb', name: 'Electronics', points: 200 },
@@ -49,6 +53,32 @@ const userRanking: UserRankingStats[] = [
 ]
 
 const EventBoard = () => {
+  const [eventID, setEventID] = useState<string | null>()
+  const { data, isError, isLoading } = useQuery(
+    'eventData',
+    () => getEventData({ eventID }),
+    {
+      enabled: !!eventID,
+    }
+  )
+
+  useEffect(() => {
+    ;(async () => {
+      const event_id = await AsyncStorage.getItem('event_id')
+      if (event_id) {
+        setEventID(event_id)
+      } else {
+        setEventID(null)
+      }
+    })()
+  }, [])
+
+  console.log({
+    isLoading,
+    isError,
+    data,
+  })
+
   return (
     <ScreenLayout omitPadding="all">
       <ScrollView>

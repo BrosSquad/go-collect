@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useNavigation } from '@react-navigation/native'
 import { Text } from '@ui-kitten/components'
 import { BarCodeScanner } from 'expo-barcode-scanner'
@@ -13,7 +14,8 @@ const CheckInScreen = () => {
   const navigation = useNavigation<any>()
 
   const mutation = useMutation(checkInRequest, {
-    onSuccess: () => {
+    onSuccess: async ({ event_id }) => {
+      await AsyncStorage.setItem('event_id', event_id.toString())
       navigation.navigate('EventBoard')
     },
   })
@@ -25,11 +27,10 @@ const CheckInScreen = () => {
     })()
   }, [])
 
-  const handleBarCodeScanned = ({ data }) => {
-    setScanned(true)
+  const handleBarCodeScanned = async ({ data }) => {
     const { event_id } = JSON.parse(data)
-    mutation.mutate({ event_id })
-    navigation.navigate('EventBoard')
+
+    mutation.mutate({ event_id: event_id })
   }
 
   if (hasPermission === null) {
@@ -42,7 +43,7 @@ const CheckInScreen = () => {
   return (
     <ScreenLayout>
       <BarCodeScanner
-        onBarCodeScanned={handleBarCodeScanned}
+        onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
         style={StyleSheet.absoluteFillObject}
       />
     </ScreenLayout>
