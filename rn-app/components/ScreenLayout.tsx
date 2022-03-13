@@ -8,7 +8,7 @@ type ScreenLayoutProps = {
   style?: ViewStyle
 }
 
-const PADDING_X = 24
+export const PADDING_X = 24
 
 const ScreenLayout = ({ children, style }: ScreenLayoutProps) => {
   const { top, bottom, left, right } = useSafeAreaInsets()
