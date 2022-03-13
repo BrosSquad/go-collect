@@ -1,7 +1,6 @@
 package seeds
 
 import (
-	"math/rand"
 	"time"
 
 	"gorm.io/gorm"
@@ -15,19 +14,19 @@ func seedUsers(db *gorm.DB) {
 			Username: "test",
 			Password: "password",
 			City:     "Belgrade",
-			Points:    0,
+			Points:   0,
 		},
 		{
 			Username: "test-1",
 			Password: "password-1",
 			City:     "Belgrade",
-			Points:    0,
+			Points:   0,
 		},
 		{
 			Username: "test-2",
 			Password: "password-2",
 			City:     "Belgrade",
-			Points:    0,
+			Points:   0,
 		},
 	}
 
@@ -74,13 +73,43 @@ func seedAchievements(db *gorm.DB) {
 			Name:        "Achievement 1",
 			ImageUrl:    "https://via.placeholder.com/150",
 			Description: "Description 1",
-			Points:      uint64(rand.Int()),
+			Points:      uint64(10),
 		},
 		{
 			Name:        "Achievement 2",
 			ImageUrl:    "https://via.placeholder.com/150",
 			Description: "Description 2",
-			Points:      uint64(rand.Int()),
+			Points:      uint64(150),
+		},
+		{
+			Name:        "Achievement 3",
+			ImageUrl:    "https://via.placeholder.com/150",
+			Description: "Description 3",
+			Points:      uint64(50),
+		},
+		{
+			Name:        "Achievement 4",
+			ImageUrl:    "https://via.placeholder.com/150",
+			Description: "Description 4",
+			Points:      uint64(25),
+		},
+		{
+			Name:        "Achievement 5",
+			ImageUrl:    "https://via.placeholder.com/150",
+			Description: "Description 5",
+			Points:      uint64(75),
+		},
+		{
+			Name:        "Achievement 6",
+			ImageUrl:    "https://via.placeholder.com/150",
+			Description: "Description 6",
+			Points:      uint64(125),
+		},
+		{
+			Name:        "Achievement 7",
+			ImageUrl:    "https://via.placeholder.com/150",
+			Description: "Description 7",
+			Points:      uint64(175),
 		},
 	}
 
@@ -90,15 +119,15 @@ func seedAchievements(db *gorm.DB) {
 func seedExchangeRates(db *gorm.DB) {
 	data := []models.ExchangeRate{
 		{
-			Name: "Plastics",
+			Name:     "Plastics",
 			Modifier: uint64(10),
 		},
 		{
-			Name: "Metal",
+			Name:     "Metal",
 			Modifier: uint64(8),
 		},
 		{
-			Name: "Paper",
+			Name:     "Paper",
 			Modifier: uint64(6),
 		},
 	}

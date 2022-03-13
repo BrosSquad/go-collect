@@ -53,7 +53,10 @@ func (c *Container) GetAchievementService() *achievement.AchievementService {
 		return c.achievementService
 	}
 
-	c.achievementService = achievement.NewAchievementService(c.GetDbConnection(), c.GetDefaultLogger())
+	c.achievementService = achievement.NewAchievementService(
+		c.GetDbConnection(),
+		c.GetDefaultLogger(),
+	)
 
 	return c.achievementService
 }
