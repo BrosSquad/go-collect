@@ -1,6 +1,7 @@
 import { Icon, Text } from '@ui-kitten/components'
 import { FlatList, StyleSheet, View } from 'react-native'
 import useColorScheme from '../hooks/useColorScheme'
+import { PADDING_X } from './ScreenLayout'
 
 export type MaterialStats = {
   id: number
@@ -48,6 +49,7 @@ const BreakdownByMaterial = ({ materials }: BreakdownByMaterialProps) => {
 const styles = StyleSheet.create({
   container: {
     marginTop: 32,
+    paddingHorizontal: PADDING_X * 2,
   },
   itemContainer: {
     padding: 16,
