@@ -4,7 +4,9 @@ import { LoginRequest, LoginResponse } from './types/login_pb'
 import { UserProfileResponse } from './types/profile'
 import { EventDataResponse } from './types/types'
 
-const getURL = (endpoint: string) => `http://139.162.151.127:8080${endpoint}`
+export const getHost = (endpoint: string) => `192.168.0.11:8080${endpoint}`
+
+export const getURL = (endpoint: string) => `http://${getHost(endpoint)}`
 export const getHeaders = async () => {
   const headers = {
     Accept: 'application/json',

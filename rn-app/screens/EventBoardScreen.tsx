@@ -10,18 +10,13 @@ import ScreenLayout from '../components/ScreenLayout'
 import TopRankedList, { UserRankingStats } from '../components/TopRankedList'
 import GlobalScore, { MaterialScore } from '../components/TotalBreakdown'
 import { randomIcon } from '../components/utils'
-import { getEventData } from '../requests'
+import { getEventData, getHost } from '../requests'
 import EndGameScreen from './EndGameScreen'
 import LoadingScreen from './LoadingScreen'
 
 const EventBoard = () => {
   const { data, isLoading } = useQuery('eventData', getEventData)
-  const [currentHP, setCurrentHP] = useState(() => {
-    const nextVal = data?.total_points - data?.damage
-    console.log(nextVal)
-    return isNaN(nextVal) ? data?.total_points : nextVal
-  })
-
+  const [currentHP, setCurrentHP] = useState(NaN)
   const icons = useMemo(() => [randomIcon(), randomIcon()], [])
 
   const individualScore = data?.total_points_by_exchange_rate.map(
@@ -56,19 +51,29 @@ const EventBoard = () => {
   )
 
   useEffect(() => {
-    let websocket
-    ;(async () => {
+    let websocket: WebSocket;
+    (async () => {
       const eventID = await AsyncStorage.getItem('event_id')
-      websocket = new WebSocket(
-        `ws://139.162.151.127:8080/ws/${eventID}/collection`
-      )
-      websocket.onopen = () => {
-        console.log('connected')
-      }
-      websocket.onmessage = (event) => {
+      const endpoint = `/ws/${eventID}/collection`;
+      websocket = new WebSocket(`ws://${getHost(endpoint)}`)
+
+      websocket.addEventListener('open', () => {
+        console.log('WebSocket connected');
+      })
+
+      websocket.addEventListener('message', (event: MessageEvent) => {
         const data = JSON.parse(event.data)
         setCurrentHP((prev) => prev - data?.Diff)
-      }
+      })
+
+      websocket.addEventListener('close', () => {
+        console.log('WebSocket connection closed');
+      })
+
+      websocket.addEventListener('error', (event) => {
+        console.log('Error on WebSocket Connection: ', event);
+      })
+
     })()
 
     return () => {
@@ -78,7 +83,10 @@ const EventBoard = () => {
 
   if (isLoading) return <LoadingScreen />
 
-  const maxHP = data?.total_points
+  if (isNaN(currentHP)) {
+    setCurrentHP(data?.total_points - data?.damage);
+  }
+
   if (currentHP <= 0) {
     return <EndGameScreen />
   }
@@ -86,7 +94,7 @@ const EventBoard = () => {
   return (
     <ScreenLayout omitPadding="all">
       <ScrollView>
-        <BossHealth maxHP={maxHP} currentHP={currentHP} />
+        <BossHealth maxHP={data?.total_points} currentHP={currentHP} />
         <Text category="h4" style={{ textAlign: 'center', marginTop: 16 }}>
           {data?.event?.title}
         </Text>

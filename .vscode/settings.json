@@ -8,5 +8,8 @@
   "go.inferGopath": false,
   "[go]": {
     "editor.defaultFormatter": "golang.go"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
   }
 }
